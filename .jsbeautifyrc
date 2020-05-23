@@ -1,0 +1,9 @@
+{
+  "indent_size": 2,
+  "indent_char": " ",
+  "beautify.config": "string|Object.<string,string|number|boolean>",
+  "brace_style": "collapse,preserve-inline",
+  "css": {
+    "indent_size": 2
+  }
+}
