@@ -31,4 +31,4 @@ class EntityHandler extends Events {
 
   }
 }
-module.exports = EntityHandler();
+module.exports = EntityHandler;

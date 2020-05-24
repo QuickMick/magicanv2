@@ -15,7 +15,7 @@ class ClientHandler {
   init(io) {
     this.io = io;
 
-    this.entityHandler.on("update", (update) => {
+    this.entityHandler.on("entity.update", (update) => {
       this.broadcast("entity.update", update);
     });
 
@@ -38,7 +38,8 @@ class ClientHandler {
   }
 
   broadcast(type, msg) {
-    this.io.to(this.id).emit(type, msg);
+    //  this.io.to(this.id).emit(type, msg);
+    this.io.emit(type, msg);
   }
 
   sendAllOthers(senderSocket, type, msg) {

@@ -2,6 +2,8 @@
   import Table from "./table.svelte";
   import { activeElement } from "./store.js";
 
+  export let connector = null;
+
   function onMouseUp() {
     activeElement.set(null);
   }
@@ -15,5 +17,5 @@
 </style>
 
 <div class="page" on:mouseup={onMouseUp}>
-  <Table>ttetsd</Table>
+  <Table {connector}>ttetsd</Table>
 </div>

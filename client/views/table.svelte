@@ -1,6 +1,19 @@
 <script>
   import Entity from "./entity.svelte";
   import { activeElement } from "./store.js";
+  import { onMount } from "svelte";
+  export let connector = null;
+
+  onMount(() => {
+    connector.on("entity.update", msg => {
+      for (let id in msg) {
+        const update = msg[id];
+        const entity = entities[id];
+        if (!entity) return;
+        entities[msg.id] = Object.assign(entity, update);
+      }
+    });
+  });
   let svg;
 
   let cam = {
@@ -17,14 +30,18 @@
   };
 
   function mouseMove(evt) {
-    cam.x = evt.clientX;
-    cam.y = evt.clientY;
     if ($activeElement) {
-      console.log(cam);
       const cur = entities[$activeElement];
-      cur.x = cam.x;
-      cur.y = cam.y;
+      //cur.x = evt.clientX;
+      //  cur.y = evt.clientY;
+      connector.send("update.entity", {
+        _id: $activeElement,
+        data: { x: evt.clientX, y: evt.clientY }
+      });
       entities[$activeElement] = cur;
+    } else {
+      cam.x = evt.clientX;
+      cam.y = evt.clientY;
     }
   }
 </script>

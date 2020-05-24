@@ -16,7 +16,6 @@
   export let width = height * CARD_RATIO;
 
   function setActive(evt) {
-    console.log("sdsdfdsf");
     activeElement.set(data._id);
   }
 </script>
