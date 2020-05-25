@@ -10,7 +10,7 @@
         const update = msg[id];
         const entity = entities[id];
         if (!entity) return;
-        entities[msg.id] = Object.assign(entity, update);
+        entities[id] = Object.assign(entity, update);
       }
     });
 
@@ -18,9 +18,12 @@
       console.log("created", msg);
       for (let id in msg) {
         const update = msg[id];
-        const entity = entities[id];
-        if (!entity) return;
-        entities[msg.id] = Object.assign(entity, update);
+        const ent = entities[id];
+        if (ent) {
+          entities[id] = Object.assign(ent, update);
+        } else {
+          entities[id] = update;
+        }
       }
       entities = entities;
     });
@@ -28,6 +31,7 @@
     connector.on("init", msg => {
       console.log("init", msg);
       entities = msg.entities;
+      window.entity = entities;
     });
 
     connector.on("entity.add", msg => {});
