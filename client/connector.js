@@ -20,9 +20,15 @@ class Connector {
     this.io.on("init", () => {
       initialized.set(true);
     });
-    this.io.on("entity.update", () => {
+    this.io.on("entity.updated", () => {
       if (!this.initialized) return;
     });
+
+    setTimeout(() => {
+      this.send("create.single", { cardName: "bloom tender" });
+
+    }, 1000);
+
   }
 
   send(name, msg) {

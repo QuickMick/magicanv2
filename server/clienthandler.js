@@ -9,14 +9,17 @@ class ClientHandler {
     // all connected clients
     this.clients = {};
 
-
   }
 
   init(io) {
     this.io = io;
 
-    this.entityHandler.on("entity.update", (update) => {
-      this.broadcast("entity.update", update);
+    this.entityHandler.on("updated", (update) => {
+      this.broadcast("entity.updated", update);
+    });
+
+    this.entityHandler.on("created", (update) => {
+      this.broadcast("entity.created", update);
     });
 
     io.on('connection', async (socket) => {
@@ -26,6 +29,20 @@ class ClientHandler {
 
       socket.on("create.deck", (payload) => {
         //  const createdDeck = await this.mtgInterface.createDeck(payload.deck);
+      });
+
+
+      socket.on("create.single", async (payload) => {
+
+        try {
+          const result = await this.mtgInterface.loadSingle(payload.cardName);
+          result.type = "card";
+          this.entityHandler.createEntity(result);
+          //  const createdDeck = await this.mtgInterface.createDeck(payload.deck);
+        } catch (e) {
+          console.error(e);
+          socket.emit("error", { error: "cannot load card" });
+        }
       });
 
       socket.on("update.entity", (payload) => {

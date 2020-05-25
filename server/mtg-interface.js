@@ -9,7 +9,9 @@ const CARD_DATA = require("./scryfall-default-cards.json");
 function download(uri, filename) {
   return new Promise((resolve, reject) => {
     request.head(uri, function(err, res, body) {
-      request(uri).pipe(fs.createWriteStream(filename)).on('close', () => resolve());
+      request(uri).pipe(fs.createWriteStream(filename))
+        .on('close', () => resolve())
+        .on("error", (err) => reject(err));
     });
   });
 };
@@ -17,8 +19,8 @@ function download(uri, filename) {
 function doesFileExist(path) {
   return new Promise((resolve, reject) => {
     fs.access(path, fs.F_OK, (err) => {
-      if (err) reject();
-      return resolve();
+      if (err) resolve(false);
+      return resolve(true);
       // return resolve(err ? false : true);
     });
   });
@@ -26,7 +28,7 @@ function doesFileExist(path) {
 
 function cardByName(name) {
   for (let card of CARD_DATA) {
-    if (card.name == name) return card;
+    if (card.name.toLowerCase() == name.toLowerCase()) return card;
   }
 }
 
@@ -93,6 +95,35 @@ class MtgInterface {
       imgs, // client needs to fetch this
       errors
     };
+  }
+
+
+  async loadSingle(card) {
+    if (!card) throw new Error("No card name provided");
+    const name = card.replace(/(\d+)/, "").trim();
+    if (!name) throw new Error("Cannot parse card name"); // cant work with this data
+    // search the according data
+    const data = cardByName(name);
+    // put into error list, if there is a name, but no data 
+    // typo?
+    if (!data) {
+      throw new Error("Card not found");
+    }
+
+    // download the image, if it does not exist
+    const targetFileName = data.id + ".jpg";
+    const targetPath = path.join(IMG_OUTPUT_FOLDER, targetFileName);
+    const url = data.image_uris.border_crop || data.image_uris.normal;
+    // if there occures an error in filecheck, catch it and download the file
+    const doesExist = await doesFileExist(targetPath);
+    const result = {
+      img: targetFileName,
+      data
+    };
+
+    if (doesExist) return result;
+    await download(url, targetPath);
+    return result;
   }
 }
 

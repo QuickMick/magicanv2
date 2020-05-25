@@ -1,4 +1,5 @@
 const Events = require("events");
+const ObjectId = require("bson-objectid");
 
 class EntityHandler extends Events {
   constructor() {
@@ -18,14 +19,26 @@ class EntityHandler extends Events {
   }
 
   createEntity(data) {
-
+    const id = ObjectId().toString();
+    if (data.type === "card") {
+      const result = {
+        x: 0,
+        y: 0,
+        img: data.img,
+        _id: id
+      };
+      this.entities[id] = result;
+      this.emit("created", {
+        [id]: result
+      });
+    }
   }
 
   updateEntity(id, updates) {
     const cur = this.entities[id];
     this.entities[id] = Object.assign(cur, updates);
 
-    this.emit("entity.update", {
+    this.emit("updated", {
       [id]: cur
     });
 

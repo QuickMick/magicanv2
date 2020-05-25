@@ -5,7 +5,7 @@
   export let connector = null;
 
   onMount(() => {
-    connector.on("entity.update", msg => {
+    connector.on("entity.updated", msg => {
       for (let id in msg) {
         const update = msg[id];
         const entity = entities[id];
@@ -13,6 +13,24 @@
         entities[msg.id] = Object.assign(entity, update);
       }
     });
+
+    connector.on("entity.created", msg => {
+      console.log("created", msg);
+      for (let id in msg) {
+        const update = msg[id];
+        const entity = entities[id];
+        if (!entity) return;
+        entities[msg.id] = Object.assign(entity, update);
+      }
+      entities = entities;
+    });
+
+    connector.on("init", msg => {
+      console.log("init", msg);
+      entities = msg.entities;
+    });
+
+    connector.on("entity.add", msg => {});
   });
   let svg;
 
@@ -21,13 +39,7 @@
     y: 0
   };
 
-  let entities = {
-    abcd: {
-      x: 0,
-      y: 0,
-      _id: "abcd"
-    }
-  };
+  let entities = {};
 
   function mouseMove(evt) {
     if ($activeElement) {
