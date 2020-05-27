@@ -1,0 +1,19 @@
+body {
+  font-family: "arial";
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+.no-select {
+  user-select: none;
+}
+
+.ignore {
+  pointer-events: none;
+}
+
+.acknowledge {
+  pointer-events: all;
+}
