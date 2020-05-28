@@ -21,7 +21,7 @@ class MtgInterface {
     //https://api.scryfall.com/cards/named?fuzzy=aust+com 
     const fixed = name.replace(/\s/g, "+");
     const result = await fetch('https://api.scryfall.com/cards/named?fuzzy=' + fixed)
-      .then(response => response.json());
+      .then(response => response.json()).catch(e => { console.log(e); return { code: "not_found" }; });
 
     this.__cache[name] = result;
 
@@ -86,12 +86,22 @@ class MtgInterface {
         deck[name].count += count;
       } else {
         // wrap data in easy readable format
+        let backside = "";
+        if (!data.image_uris) {
+          if (data.card_faces) {
+            data.image_uris = data.card_faces[0].image_uris;
+            const biu = data.card_faces[1].image_uris;
+            backside = biu ? biu.border_crop || biu.normal : "";
+          }
+          console.log("err", data);
+        }
 
         const url = data ? data.image_uris.border_crop || data.image_uris.normal : "";
         deck[name] = {
           name,
           count,
           url,
+          backside,
           data
         };
       }

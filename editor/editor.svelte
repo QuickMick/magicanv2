@@ -11,17 +11,21 @@
   let input;
 
   async function update(evt) {
-    console.log(evt.keyCode);
     if (evt.keyCode !== 27) return;
-    promise = CardLoader.createDeck(input.value || "");
-    console.log(groups);
+    promise = CardLoader.createDeck(input.value || "").catch(e => {
+      console.error(e);
+      throw e;
+    });
   }
 
   function remove(card) {
     const r = new RegExp(`^.*${card.name}.*$`, "gm");
 
     input.value = input.value.replace(r, "");
-    promise = CardLoader.createDeck(input.value || "");
+    promise = CardLoader.createDeck(input.value || "").catch(e => {
+      console.error(e);
+      throw e;
+    });
   }
 
   onMount(async () => {
