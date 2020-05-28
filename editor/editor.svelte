@@ -55,7 +55,8 @@ mountain
 20 blightsteel colossus`;
 
     input.value = start;
-    promise = CardLoader.createDeck(start, (p, a) => sp(p, a));
+    console.log("STSFSDF", Cookies.get("deck")),
+      (promise = CardLoader.createDeck(start, (p, a) => sp(p, a)));
   });
 
   function onTyping() {
@@ -165,10 +166,52 @@ mountain
     font-size: 24px;
   }
 
-  h2 {
+  .group-header {
+    display: flex;
     background: darkgrey;
-    padding: 8px;
+    /* padding: 8px; */
+    margin: 8px 0;
     box-shadow: 0px 0px 8px black;
+    width: 100%;
+    flex-direction: row;
+  }
+
+  .group-header h2 {
+    padding: 0 25px;
+    margin: 0px;
+  }
+
+  .group-statistics {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .group-value {
+    padding: 5px;
+  }
+  .blue {
+    color: blue;
+  }
+  .black {
+    color: black;
+  }
+  .red {
+    color: red;
+  }
+  .white {
+    color: wheat;
+  }
+  .green {
+    color: green;
+  }
+  .colorless {
+    color: gray;
+  }
+  .generic {
+    color: goldenrod;
+  }
+  .sum {
+    color: goldenrod;
   }
 
   .lds-ripple {
@@ -222,11 +265,13 @@ mountain
       <p>NOTE: we use cookies to store your deck after reload.</p>
       <p>NOTE: This is not an official Magic produkt.</p>
 
-      {#if progress !== all}
+      {#await promise}
         <div>loading: {progress}/{all}</div>
-      {:else}
-        <div>Total cards: {all}</div>
-      {/if}
+      {:then groups}
+        <div>Total cards: {groups['cardCount']}</div>
+      {:catch error}
+        asdasdasasdasd {error}
+      {/await}
       Format:
       <select bind:this={format} on:blur={reload} on:change={reload}>
         <option selected>commander</option>
@@ -257,10 +302,36 @@ mountain
         </div>
       </div>
     {:then groups}
-
+      <div class="statistics">
+        <div class="deck-value blue">{groups['mana'].blue}</div>
+        <div class="deck-value black">{groups['mana'].black}</div>
+        <div class="deck-value red">{groups['mana'].red}</div>
+        <div class="deck-value white">{groups['mana'].white}</div>
+        <div class="deck-value green">{groups['mana'].green}</div>
+        <div class="deck-value colorless">{groups['mana'].colorless}</div>
+        <div class="deck-value generic">{groups['mana'].generic}</div>
+        <div class="deck-value sum">{groups['mana'].sum}</div>
+        <div class="deck-value group-cost">{groups.cost + '$'}</div>
+      </div>
       {#each groups || [] as group}
         <div class="group">
-          <h2>{group.name + ' // ' + group.count || 'no name'}</h2>
+
+          <div class="group-header">
+            <h2>{group.name + ' // ' + group.count || 'no name'}</h2>
+
+            <div class="group-statistics">
+              <div class="group-value blue">{group.mana.blue}</div>
+              <div class="group-value black">{group.mana.black}</div>
+              <div class="group-value red">{group.mana.red}</div>
+              <div class="group-value white">{group.mana.white}</div>
+              <div class="group-value green">{group.mana.green}</div>
+              <div class="group-value colorless">{group.mana.colorless}</div>
+              <div class="group-value generic">{group.mana.generic}</div>
+              <div class="group-value sum">{group.mana.sum}</div>
+              <div class="group-value group-cost">{group.cost + '$'}</div>
+
+            </div>
+          </div>
           <div class="group-content">
             {#each group.cards as card}
               <div

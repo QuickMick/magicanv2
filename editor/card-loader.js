@@ -108,17 +108,72 @@ class MtgInterface {
       }
     }
 
+    const overallDevotion = {
+      blue: 0,
+      black: 0,
+      red: 0,
+      white: 0,
+      green: 0,
+      colorless: 0,
+      generic: 0,
+      sum: 0
+    };
+    //mana_cost: "{W}{U}{B}{R}{G} {C}"
+
+    let overallCount = 0;
+    let overallCost = 0;
+    //mana_cost.split("G").length - 1
     for (let group of groups) {
       group.cards = Object.values(group.deck);
       group.cards = group.cards.sort((a, b) => a.data.cmc > b.data.cmc ? 1 : -1);
 
       let count = 0;
+      let cost = 0;
+      const devotion = {
+        blue: 0,
+        black: 0,
+        red: 0,
+        white: 0,
+        green: 0,
+        colorless: 0,
+        generic: 0,
+        sum: 0
+      };
       for (let card of group.cards) {
         count += card.count;
-      }
-      group.count = count;
-    }
 
+        cost += parseFloat(card.data.prices.usd || 0) * card.count;
+
+        devotion.blue += (card.data.mana_cost.split("U").length - 1) * card.count;
+        devotion.black += (card.data.mana_cost.split("B").length - 1) * card.count;
+        devotion.red += (card.data.mana_cost.split("R").length - 1) * card.count;
+        devotion.white += (card.data.mana_cost.split("W").length - 1) * card.count;
+        devotion.green += (card.data.mana_cost.split("G").length - 1) * card.count;
+        devotion.colorless += (card.data.mana_cost.split("C").length - 1) * card.count;
+
+        devotion.generic += Math.floor(card.data.mana_cost.replace(/[^0-9.]/g, "") || 0) * card.count;
+
+        devotion.sum = devotion.blue + devotion.black + devotion.red + devotion.green + devotion.white + devotion.colorless + devotion.generic;
+
+      }
+      overallCost += cost;
+      overallCount += count;
+      group.count = count;
+      group.mana = devotion;
+      group.cost = cost;
+
+      overallDevotion.blue += devotion.blue;
+      overallDevotion.black += devotion.black;
+      overallDevotion.red += devotion.red;
+      overallDevotion.white += devotion.white;
+      overallDevotion.green += devotion.green;
+      overallDevotion.colorless += devotion.colorless;
+      overallDevotion.generic += devotion.generic;
+      overallDevotion.sum += devotion.sum;
+    }
+    groups["cardCount"] = overallCount;
+    groups["cost"] = overallCost;
+    groups["mana"] = overallDevotion;
     return groups;
   }
 }
