@@ -58,7 +58,7 @@ class MtgInterface {
 
     let curGroup = 0;
 
-    let progress = 1;
+    let progress = 0;
     // iterate each found card
     for (let card of deckRaw) {
       if (!card) continue;
@@ -69,7 +69,7 @@ class MtgInterface {
       }
       progress++;
       const deck = groups[curGroup].deck;
-      update(progress, deckRaw.length);
+      update(progress, deckRaw.length - groups.length + 1);
       // extract the count from the string and free the name
 
       let count = Math.floor(((card.match(/(\d+)/) || [])[0] || 1));
@@ -118,6 +118,7 @@ class MtgInterface {
       }
       group.count = count;
     }
+
     return groups;
   }
 }
