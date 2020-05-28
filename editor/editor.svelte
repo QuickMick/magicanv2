@@ -265,7 +265,7 @@ mountain
             {#each group.cards as card}
               <div
                 class="entry"
-                style={'width:' + width + 'px; height:' + (card.count <= 4 ? height + ((card.count || 1) - 1) * 40 : height) + 'px;'}>
+                style={'width:' + width + 'px; height:' + (card.count <= 4 ? height + ((card.count || 1) - 1) * 40 : height + 3 * 40) + 'px;'}>
 
                 {#each { length: card.count > 4 ? 4 : card.count } as _, i}
                   <img
