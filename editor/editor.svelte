@@ -286,7 +286,7 @@ mountain
                   <div class="count">{card.count}x</div>
                 {/if}
 
-                <div class="price">{card.data.prices.usd}$</div>
+                <div class="price">{card.data.prices.usd + '$' || '???'}</div>
               </div>
             {/each}
           </div>
