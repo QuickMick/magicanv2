@@ -11,7 +11,7 @@
   let promise = new Promise(resolve => resolve([]));
 
   let input;
-
+  let format;
   let progress = 0;
   let all = 0;
 
@@ -29,7 +29,9 @@
       throw e;
     });
   }
-
+  function reload() {
+    update({ keyCode: 27 });
+  }
   function remove(card) {
     const r = new RegExp(`^.*${card.name}.*$`, "gm");
 
@@ -129,10 +131,17 @@ mountain
     box-shadow: 0px 0px 10px black;
   }
 
+  .card.banned {
+    border: 6px solid red;
+  }
+
   .card:hover {
     border: 6px solid blue;
     cursor: pointer;
   }
+
+  .price,
+  .banned-text,
   .count {
     font-size: 34px;
     text-shadow: 0px 0px 9px black;
@@ -140,8 +149,20 @@ mountain
     position: absolute;
     z-index: 100;
     font-weight: bold;
-    top: 43px;
     left: 34px;
+  }
+
+  .banned-text {
+    top: 50px;
+  }
+  .count {
+    top: 165px;
+  }
+
+  .price {
+    bottom: 20px;
+    color: wheat;
+    font-size: 24px;
   }
 
   h2 {
@@ -198,12 +219,30 @@ mountain
         <li>use the "ESC" key to reaload the preview</li>
         <li>doubleclick a card to remove it</li>
       </ul>
+      <p>NOTE: we use cookies to store your deck after reload.</p>
+      <p>NOTE: This is not an official Magic produkt.</p>
 
       {#if progress !== all}
         <div>loading: {progress}/{all}</div>
       {:else}
         <div>Total cards: {all}</div>
       {/if}
+      Format:
+      <select bind:this={format} on:blur={reload} on:change={reload}>
+        <option selected>commander</option>
+        <option>brawl</option>
+        <option>duel</option>
+        <option>future</option>
+        <option>historic</option>
+        <option>legacy</option>
+        <option>modern</option>
+        <option>oldschool</option>
+        <option>pauper</option>
+        <option>penny</option>
+        <option>pioneer</option>
+        <option>standard</option>
+        <option>vintage</option>
+      </select>
 
     </div>
     <textarea bind:this={input} class="input" on:keyup={onTyping} />
@@ -228,27 +267,26 @@ mountain
                 class="entry"
                 style={'width:' + width + 'px; height:' + (card.count <= 4 ? height + ((card.count || 1) - 1) * 40 : height) + 'px;'}>
 
-                {#if card.count <= 4}
-                  {#each { length: card.count } as _, i}
-                    <img
-                      on:dblclick={() => remove(card)}
-                      class="card"
-                      style={'margin-top: ' + i * 40 + 'px'}
-                      src={card.url}
-                      alt={card.name}
-                      {width}
-                      {height} />
-                  {/each}
-                {:else}
+                {#each { length: card.count > 4 ? 4 : card.count } as _, i}
                   <img
+                    class:banned={card.data.legalities[format.value] !== 'legal'}
                     on:dblclick={() => remove(card)}
                     class="card"
+                    style={'margin-top: ' + i * 40 + 'px'}
                     src={card.url}
                     alt={card.name}
                     {width}
                     {height} />
-                  <div class="count">{card.count}</div>
+                {/each}
+
+                {#if card.data.legalities[format.value] !== 'legal'}
+                  <div class="banned-text">BANNED</div>
                 {/if}
+                {#if card.count > 4}
+                  <div class="count">{card.count}x</div>
+                {/if}
+
+                <div class="price">{card.data.prices.usd}$</div>
               </div>
             {/each}
           </div>
