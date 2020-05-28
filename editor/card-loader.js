@@ -5,7 +5,7 @@ function timeout() {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       resolve();
-    }, 150);
+    }, 70);
   });
 }
 
@@ -17,7 +17,7 @@ class MtgInterface {
 
   async cardByName(name) {
     if (this.__cache[name]) return this.__cache[name];
-    // await timeout();
+    await timeout();
     //https://api.scryfall.com/cards/named?fuzzy=aust+com 
     const fixed = name.replace(/\s/g, "+");
     const result = await fetch('https://api.scryfall.com/cards/named?fuzzy=' + fixed)
@@ -40,7 +40,7 @@ class MtgInterface {
    * @param {String} deckString the complete deck, copied from a site or e.g forge
    * @memberof MtgInterface
    */
-  async createDeck(deckString) {
+  async createDeck(deckString, update = () => {}) {
     // convert the deck string to an array
 
     let groups = [...deckString.match(/#(.*?)(\n|$)/g) || ["main"]];
@@ -58,6 +58,7 @@ class MtgInterface {
 
     let curGroup = 0;
 
+    let progress = 1;
     // iterate each found card
     for (let card of deckRaw) {
       if (!card) continue;
@@ -66,9 +67,9 @@ class MtgInterface {
         if (curGroup > groups.length) curGroup = 0;
         continue;
       }
-
+      progress++;
       const deck = groups[curGroup].deck;
-
+      update(progress, deckRaw.length);
       // extract the count from the string and free the name
 
       let count = Math.floor(((card.match(/(\d+)/) || [])[0] || 1));

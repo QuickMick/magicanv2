@@ -10,9 +10,19 @@
 
   let input;
 
+  let progress = 0;
+  let all = 0;
+
+  function sp(p, a) {
+    progress = p;
+    all = a;
+  }
+
   async function update(evt) {
     if (evt.keyCode !== 27) return;
-    promise = CardLoader.createDeck(input.value || "").catch(e => {
+    promise = CardLoader.createDeck(input.value || "", (p, a) =>
+      sp(p, a)
+    ).catch(e => {
       console.error(e);
       throw e;
     });
@@ -22,7 +32,9 @@
     const r = new RegExp(`^.*${card.name}.*$`, "gm");
 
     input.value = input.value.replace(r, "");
-    promise = CardLoader.createDeck(input.value || "").catch(e => {
+    promise = CardLoader.createDeck(input.value || "", (p, a) =>
+      sp(p, a)
+    ).catch(e => {
       console.error(e);
       throw e;
     });
@@ -36,7 +48,7 @@ mountain
 # main deck
 20 blightsteel colossus`;
     input.value = start;
-    promise = CardLoader.createDeck(start);
+    promise = CardLoader.createDeck(start, (p, a) => sp(p, a));
   });
 </script>
 
@@ -177,6 +189,12 @@ mountain
         <li>use the "ESC" key to reaload the preview</li>
         <li>doubleclick a card to remove it</li>
       </ul>
+
+      {#if progress !== all}
+        <div>loading: {progress}/{all}</div>
+      {:else}
+        <div>Total cards: {all}</div>
+      {/if}
 
     </div>
     <textarea bind:this={input} class="input" />
