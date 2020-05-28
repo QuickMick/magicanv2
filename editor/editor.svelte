@@ -153,7 +153,7 @@ mountain
   }
 
   .banned-text {
-    top: 50px;
+    bottom: 135px;
   }
   .count {
     top: 165px;
