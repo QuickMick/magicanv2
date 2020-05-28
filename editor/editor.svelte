@@ -67,6 +67,7 @@ mountain
 
   .help {
     padding: 0px 10px 10px 10px;
+    user-select: none;
   }
 
   .group-content {
@@ -83,6 +84,7 @@ mountain
     flex-wrap: nowrap;
     overflow: auto;
     position: relative;
+    user-select: none;
   }
 
   .loading-wrapper {

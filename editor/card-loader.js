@@ -109,6 +109,7 @@ class MtgInterface {
 
     for (let group of groups) {
       group.cards = Object.values(group.deck);
+      group.cards = group.cards.sort((a, b) => a.data.cmc > b.data.cmc ? 1 : -1);
 
       let count = 0;
       for (let card of group.cards) {
