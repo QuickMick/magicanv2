@@ -2,6 +2,8 @@
   import { onMount } from "svelte";
   import CardLoader from "./card-loader.js";
 
+  import Cookies from "js-cookie";
+
   const CARD_RATIO = 0.71764705882;
   export let height = 300;
   export let width = Math.floor(height * CARD_RATIO);
@@ -41,15 +43,22 @@
   }
 
   onMount(async () => {
-    const start = `#lands
+    const start =
+      Cookies.get("deck") ||
+      `#lands
 mountain
 2 plains
 3 swamps
 # main deck
 20 blightsteel colossus`;
+
     input.value = start;
     promise = CardLoader.createDeck(start, (p, a) => sp(p, a));
   });
+
+  function onTyping() {
+    Cookies.set("deck", input.value, { expires: 7 });
+  }
 </script>
 
 <style>
@@ -197,7 +206,7 @@ mountain
       {/if}
 
     </div>
-    <textarea bind:this={input} class="input" />
+    <textarea bind:this={input} class="input" on:keyup={onTyping} />
   </div>
 
   <div class="display">
