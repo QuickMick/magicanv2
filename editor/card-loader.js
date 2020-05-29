@@ -80,6 +80,8 @@ class MtgInterface {
       if (!name) continue; // cant work with this data
       // search the according data
       let data = await this.cardByName(name);
+
+      deckString = deckString.replace(name, data.name);
       if (data.code == "not_found") {
         data = { image_uris: {} };
       }
@@ -174,6 +176,7 @@ class MtgInterface {
     groups["cardCount"] = overallCount;
     groups["cost"] = overallCost;
     groups["mana"] = overallDevotion;
+    groups["corrected"] = deckString;
     return groups;
   }
 }

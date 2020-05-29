@@ -15,6 +15,15 @@
   let progress = 0;
   let all = 0;
 
+  let hiddenGroups = new Set();
+
+  function toggleGroupVisibility(group) {
+    if (hiddenGroups.has(group.name)) hiddenGroups.delete(group.name);
+    else hiddenGroups.add(group.name);
+
+    hiddenGroups = hiddenGroups;
+  }
+
   function sp(p, a) {
     progress = p;
     all = a;
@@ -22,12 +31,17 @@
 
   async function update(evt) {
     if (evt.keyCode !== 27) return;
-    promise = CardLoader.createDeck(input.value || "", (p, a) =>
-      sp(p, a)
-    ).catch(e => {
-      console.error(e);
-      throw e;
-    });
+    promise = CardLoader.createDeck(input.value || "", (p, a) => {
+      sp(p, a);
+    })
+      .catch(e => {
+        console.error(e);
+        throw e;
+      })
+      .then(res => {
+        input.value = res.corrected;
+        return res;
+      });
   }
   function reload() {
     update({ keyCode: 27 });
@@ -98,6 +112,12 @@ mountain
     flex-grow: 1;
     display: flex;
     flex-wrap: wrap;
+    transition: height 500ms ease;
+  }
+
+  .group-content.hidden {
+    overflow: hidden;
+    height: 45px;
   }
 
   .display {
@@ -163,7 +183,8 @@ mountain
   .price {
     bottom: 20px;
     color: wheat;
-    font-size: 24px;
+    font-size: 16px;
+    font-weight: normal;
   }
 
   .group-header {
@@ -318,7 +339,9 @@ mountain
 
           <div class="group-header">
             <h2>{group.name + ' // ' + group.count || 'no name'}</h2>
-
+            <button on:click={() => toggleGroupVisibility(group)}>
+              toggle
+            </button>
             <div class="group-statistics">
               <div class="group-value blue">{group.mana.blue}</div>
               <div class="group-value black">{group.mana.black}</div>
@@ -332,7 +355,10 @@ mountain
 
             </div>
           </div>
-          <div class="group-content">
+          <div
+            class="group-content"
+            class:hidden={hiddenGroups.has(group.name)}>
+
             {#each group.cards as card}
               <div
                 class="entry"
