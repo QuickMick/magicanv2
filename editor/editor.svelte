@@ -210,32 +210,40 @@ mountain
     flex-direction: row;
   }
 
+  .deck-value,
   .group-value {
     padding: 5px;
+    color: black;
+    border-radius: 50%;
+    width: 15px;
+    height: 15px;
+    text-align: center;
+    margin: 5px;
   }
   .blue {
-    color: blue;
+    background-color: blue;
   }
   .black {
-    color: black;
+    color: white;
+    background-color: black;
   }
   .red {
-    color: red;
+    background-color: red;
   }
   .white {
-    color: wheat;
+    background-color: wheat;
   }
   .green {
-    color: green;
+    background-color: green;
   }
   .colorless {
-    color: gray;
+    background-color: gray;
   }
   .generic {
-    color: goldenrod;
+    background-color: goldenrod;
   }
   .sum {
-    color: goldenrod;
+    background-color: goldenrod;
   }
 
   .lds-ripple {
@@ -335,6 +343,7 @@ mountain
         <div class="deck-value green">{groups['mana'].green}</div>
         <div class="deck-value colorless">{groups['mana'].colorless}</div>
         <div class="deck-value generic">{groups['mana'].generic}</div>
+        sum:
         <div class="deck-value sum">{groups['mana'].sum}</div>
         <div class="deck-value group-cost">{groups.cost + '$'}</div>
       </div>
@@ -353,7 +362,9 @@ mountain
               <div class="group-value white">{group.mana.white}</div>
               <div class="group-value green">{group.mana.green}</div>
               <div class="group-value colorless">{group.mana.colorless}</div>
+              generic:
               <div class="group-value generic">{group.mana.generic}</div>
+              sum:
               <div class="group-value sum">{group.mana.sum}</div>
               <div class="group-value group-cost">{group.cost + '$'}</div>
 
