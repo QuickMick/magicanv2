@@ -85,7 +85,10 @@ mountain
     width: 100%;
     height: 100%;
   }
-
+  .statistics {
+    display: flex;
+    flex-direction: row;
+  }
   .input {
     width: 100%;
     height: 100%;
@@ -324,6 +327,7 @@ mountain
       </div>
     {:then groups}
       <div class="statistics">
+        overall:
         <div class="deck-value blue">{groups['mana'].blue}</div>
         <div class="deck-value black">{groups['mana'].black}</div>
         <div class="deck-value red">{groups['mana'].red}</div>
