@@ -109,7 +109,7 @@ class MtgInterface {
         };
       }
     }
-
+    let landCount = 0;
     const overallDevotion = {
       blue: 0,
       black: 0,
@@ -148,8 +148,11 @@ class MtgInterface {
 
         cost += parseFloat(card.data.prices.usd || 0) * card.count;
 
-        if (!card.data.type_line.toLowerCase().includes("land"))
+        if (!card.data.type_line.toLowerCase().includes("land")) {
           manaCurve[card.data.cmc || 0] = (manaCurve[card.data.cmc || 0] || 0) + card.count;
+        } else {
+          landCount += card.count;
+        }
         devotion.blue += (card.data.mana_cost.split("U").length - 1) * card.count;
         devotion.black += (card.data.mana_cost.split("B").length - 1) * card.count;
         devotion.red += (card.data.mana_cost.split("R").length - 1) * card.count;
@@ -185,7 +188,9 @@ class MtgInterface {
       overallManaCurve[i] = overallManaCurve[i] || 0;
     }
 
+    groups["landCount"] = landCount;
     groups["cardCount"] = overallCount;
+    groups["averageMana"] = overallDevotion.sum / (overallCount - landCount);
     groups["cost"] = overallCost;
     groups["mana"] = overallDevotion;
     groups["corrected"] = deckString;
