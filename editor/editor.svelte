@@ -254,12 +254,39 @@ mountain
 
   .mana-curve {
     display: flex;
+    flex-direction: column;
+  }
+
+  .all-curves {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: row;
+    height: 100px;
+  }
+
+  .all-labels {
+    display: flex;
+    flex-shrink: 0;
     flex-direction: row;
   }
 
   .curve-element {
     width: 20px;
+    display: flex;
+    position: absolute;
+    bottom: 0;
     background: blue;
+    /* vertical-align: middle; */
+    align-items: center;
+    height: 100%;
+  }
+
+  .curve-label {
+    width: 20px;
+  }
+  .curve-wrapper {
+    width: 20px;
+    position: relative;
   }
 
   .lds-ripple {
@@ -364,14 +391,23 @@ mountain
         <div class="deck-value group-cost">{Math.round(groups.cost) + '$'}</div>
 
         <div class="mana-curve">
-          {#each groups['manaCurve'] as mana, i}
-            <div
-              class="curve-element"
-              style={'height:' + getHeight(mana, groups) + '%;'}>
-              {i}:{mana}
-            </div>
-          {/each}
+          <div class="all-curves">
+            {#each groups['manaCurve'] as mana, i}
+              <div class="curve-wrapper">
+                <div
+                  class="curve-element"
+                  style={'height:' + getHeight(mana, groups) + '%;'}>
+                  {mana || ''}
+                </div>
+              </div>
+            {/each}
+          </div>
 
+          <div class="all-labels">
+            {#each groups['manaCurve'] as _, i}
+              <div class="curve-label">{i}</div>
+            {/each}
+          </div>
         </div>
       </div>
       {#each groups || [] as group}
