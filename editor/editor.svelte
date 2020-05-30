@@ -343,9 +343,7 @@ mountain
       {#await promise}
         <div>loading: {progress}/{all}</div>
       {:then groups}
-        <div>
-          Total cards: {groups['cardCount']} | Lands: {groups['landCount']}
-        </div>
+        <div>Total cards: {groups['cardCount']}</div>
         <div>
           Lands: {groups['landCount']} Nonlands: {groups['cardCount'] - groups['landCount']}
           Average Mana Cost per Nonland: {groups['averageMana']}
