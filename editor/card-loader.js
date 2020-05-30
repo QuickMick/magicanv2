@@ -83,7 +83,7 @@ class MtgInterface {
 
       deckString = deckString.replace(name, data.name);
       if (data.code == "not_found") {
-        data = { image_uris: {} };
+        data = { image_uris: {}, prices: { usd: 0 }, mana_cost: "", cmc: 0, type_line: "land" };
       }
       if (deck[name]) {
         deck[name].count += count;
@@ -120,6 +120,7 @@ class MtgInterface {
       generic: 0,
       sum: 0
     };
+    const overallManaCurve = [];
     //mana_cost: "{W}{U}{B}{R}{G} {C}"
 
     let overallCount = 0;
@@ -141,28 +142,34 @@ class MtgInterface {
         generic: 0,
         sum: 0
       };
+      const manaCurve = [];
       for (let card of group.cards) {
         count += card.count;
 
         cost += parseFloat(card.data.prices.usd || 0) * card.count;
 
+        if (!card.data.type_line.toLowerCase().includes("land"))
+          manaCurve[card.data.cmc || 0] = (manaCurve[card.data.cmc || 0] || 0) + card.count;
         devotion.blue += (card.data.mana_cost.split("U").length - 1) * card.count;
         devotion.black += (card.data.mana_cost.split("B").length - 1) * card.count;
         devotion.red += (card.data.mana_cost.split("R").length - 1) * card.count;
         devotion.white += (card.data.mana_cost.split("W").length - 1) * card.count;
         devotion.green += (card.data.mana_cost.split("G").length - 1) * card.count;
         devotion.colorless += (card.data.mana_cost.split("C").length - 1) * card.count;
-
         devotion.generic += Math.floor(card.data.mana_cost.replace(/[^0-9.]/g, "") || 0) * card.count;
-
         devotion.sum = devotion.blue + devotion.black + devotion.red + devotion.green + devotion.white + devotion.colorless + devotion.generic;
-
       }
       overallCost += cost;
       overallCount += count;
       group.count = count;
       group.mana = devotion;
       group.cost = cost;
+
+      group.manaCurve = manaCurve;
+      for (let i = 0; i < manaCurve.length; i++) {
+        manaCurve[i] = manaCurve[i] || 0;
+        overallManaCurve[i] = (overallManaCurve[i] || 0) + (manaCurve[i] || 0);
+      }
 
       overallDevotion.blue += devotion.blue;
       overallDevotion.black += devotion.black;
@@ -173,10 +180,16 @@ class MtgInterface {
       overallDevotion.generic += devotion.generic;
       overallDevotion.sum += devotion.sum;
     }
+
+    for (let i = 0; i < overallManaCurve.length; i++) {
+      overallManaCurve[i] = overallManaCurve[i] || 0;
+    }
+
     groups["cardCount"] = overallCount;
     groups["cost"] = overallCost;
     groups["mana"] = overallDevotion;
     groups["corrected"] = deckString;
+    groups["manaCurve"] = overallManaCurve;
     return groups;
   }
 }

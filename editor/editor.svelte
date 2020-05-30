@@ -76,6 +76,10 @@ mountain
   function onTyping() {
     Cookies.set("deck", input.value, { expires: 7 });
   }
+
+  function getHeight(mana, groups) {
+    return 100 * (mana / Math.max(...groups["manaCurve"]));
+  }
 </script>
 
 <style>
@@ -184,9 +188,11 @@ mountain
   }
 
   .price {
-    bottom: 20px;
+    bottom: 7px;
     color: wheat;
-    font-size: 16px;
+    font-size: 12px;
+    background: black;
+    left: 25px;
     font-weight: normal;
   }
 
@@ -244,6 +250,16 @@ mountain
   }
   .sum {
     background-color: goldenrod;
+  }
+
+  .mana-curve {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .curve-element {
+    width: 20px;
+    background: blue;
   }
 
   .lds-ripple {
@@ -345,7 +361,18 @@ mountain
         <div class="deck-value generic">{groups['mana'].generic}</div>
         sum:
         <div class="deck-value sum">{groups['mana'].sum}</div>
-        <div class="deck-value group-cost">{groups.cost + '$'}</div>
+        <div class="deck-value group-cost">{Math.round(groups.cost) + '$'}</div>
+
+        <div class="mana-curve">
+          {#each groups['manaCurve'] as mana, i}
+            <div
+              class="curve-element"
+              style={'height:' + getHeight(mana, groups) + '%;'}>
+              {i}:{mana}
+            </div>
+          {/each}
+
+        </div>
       </div>
       {#each groups || [] as group}
         <div class="group">
@@ -366,9 +393,11 @@ mountain
               <div class="group-value generic">{group.mana.generic}</div>
               sum:
               <div class="group-value sum">{group.mana.sum}</div>
-              <div class="group-value group-cost">{group.cost + '$'}</div>
-
+              <div class="group-value group-cost">
+                {Math.round(group.cost) + '$'}
+              </div>
             </div>
+
           </div>
           <div
             class="group-content"
