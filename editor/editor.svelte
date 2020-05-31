@@ -666,7 +666,7 @@ mountain
                       <div
                         class="curve-label"
                         class:highlighted={devotionHighlight == i}
-                        on:click={() => highlightDevotion(mana)}>
+                        on:click={() => highlightDevotion(i)}>
                         {i}
                       </div>
                     {/if}
