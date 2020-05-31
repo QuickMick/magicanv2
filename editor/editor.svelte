@@ -122,7 +122,9 @@ mountain
 20 blightsteel colossus`;
 
     helpActive = Cookies.get("helpActive") == "true";
+    console.log("help:", Cookies.get("helpActive"));
     cardSearchActive = Cookies.set("cardSearchActive") == "true";
+    console.log("search:", Cookies.set("cardSearchActive"));
     input.value = start;
     console.log("STSFSDF", Cookies.get("deck")),
       (promise = CardLoader.createDeck(start, (p, a) => sp(p, a)));
