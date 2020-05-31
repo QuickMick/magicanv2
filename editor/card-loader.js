@@ -214,6 +214,8 @@ class MtgInterface {
         } else {
           landCount += card.count;
         }
+
+        card.data.mana_cost = card.data.mana_cost || "";
         devotion.blue += (card.data.mana_cost.split("U").length - 1) * card.count;
         devotion.black += (card.data.mana_cost.split("B").length - 1) * card.count;
         devotion.red += (card.data.mana_cost.split("R").length - 1) * card.count;
