@@ -56,7 +56,10 @@ class MtgInterface {
       baseurl = opts;
     }
     return fetch(baseurl)
-      .then(response => response.json())
+      .then(async response => {
+        const a = await response.json();
+        return a;
+      })
       .then(response => {
         for (let c of response.data) {
           console.log("c", c);

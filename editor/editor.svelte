@@ -542,6 +542,11 @@ mountain
     border-radius: 50%;
     animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
   }
+
+  .card-search .lds-ripple div {
+    border: 4px solid black;
+  }
+
   .lds-ripple div:nth-child(2) {
     animation-delay: -0.5s;
   }
@@ -860,36 +865,41 @@ mountain
         </div>
       </div>
     {:then result}
-      <div class="search-result">
-        {#each result.data as card}
-          <div
-            class="entry"
-            style={'width:' + width + 'px; height:' + height + 'px;'}>
-            <img
-              on:dblclick={() => appendCard(card.name)}
-              class:banned={card.legalities[format.value] !== 'legal'}
-              class="card"
-              src={card.url}
-              alt={card.name}
-              {width}
-              {height} />
 
-            {#if card.legalities[format.value] !== 'legal'}
-              <div class="banned-text">BANNED</div>
-            {/if}
-            {#if scaling > 90}
-              <div class="price">{card.prices.usd + '$' || '???'}</div>
-            {/if}
-          </div>
-        {:else}
-          <div>No cards found</div>
-        {/each}
-      </div>
-      <button
-        disabled={!result.has_more}
-        on:click={() => searchCards(result.next_page)}>
-        next
-      </button>
+      {#if result.code !== 'not_found' && result.data}
+        <div class="search-result">
+          {#each result.data as card}
+            <div
+              class="entry"
+              style={'width:' + width + 'px; height:' + height + 'px;'}>
+              <img
+                on:dblclick={() => appendCard(card.name)}
+                class:banned={card.legalities[format.value] !== 'legal'}
+                class="card"
+                src={card.url}
+                alt={card.name}
+                {width}
+                {height} />
+
+              {#if card.legalities[format.value] !== 'legal'}
+                <div class="banned-text">BANNED</div>
+              {/if}
+              {#if scaling > 90}
+                <div class="price">{card.prices.usd + '$' || '???'}</div>
+              {/if}
+            </div>
+          {:else}
+            <div>No cards found</div>
+          {/each}
+        </div>
+        <button
+          disabled={!result.has_more}
+          on:click={() => searchCards(result.next_page)}>
+          next
+        </button>
+      {:else}
+        <div>No cards found</div>
+      {/if}
     {:catch error}
       <div class="error">
         ERROR, check your decklist for correct format or internet connection
