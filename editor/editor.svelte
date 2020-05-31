@@ -29,7 +29,7 @@
 
   let promise = new Promise(resolve => resolve([]));
   let cardSearchPromise = new Promise(resolve =>
-    resolve({ data: {}, has_more: false, total_cards: 0 })
+    resolve({ data: [], has_more: false, total_cards: 0 })
   );
 
   let input;
