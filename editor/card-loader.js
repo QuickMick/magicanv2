@@ -81,9 +81,10 @@ class MtgInterface {
       // search the according data
       let data = await this.cardByName(name);
 
-      deckString = deckString.replace(name, data.name);
+      if (data.name)
+        deckString = deckString.replace(name, data.name);
       if (data.code == "not_found") {
-        data = { image_uris: {}, prices: { usd: 0 }, mana_cost: "", cmc: 0, type_line: "land" };
+        data = { image_uris: {}, legalities: {}, prices: { usd: 0 }, mana_cost: "", cmc: 0, type_line: "land" };
       }
       if (deck[name]) {
         deck[name].count += count;
@@ -180,6 +181,7 @@ class MtgInterface {
       overallDevotion.white += devotion.white;
       overallDevotion.green += devotion.green;
       overallDevotion.colorless += devotion.colorless;
+
       overallDevotion.generic += devotion.generic;
       overallDevotion.sum += devotion.sum;
     }
@@ -187,6 +189,21 @@ class MtgInterface {
     for (let i = 0; i < overallManaCurve.length; i++) {
       overallManaCurve[i] = overallManaCurve[i] || 0;
     }
+
+    const nonlands = overallCount - landCount;
+
+    let justDevotion = overallDevotion.blue + overallDevotion.black + overallDevotion.red + overallDevotion.white + overallDevotion.green + overallDevotion.colorless;
+    justDevotion = justDevotion || 1;
+    const manaProposal = {
+      blue: overallDevotion.blue / justDevotion,
+      black: overallDevotion.black / justDevotion,
+      red: overallDevotion.red / justDevotion,
+      white: overallDevotion.white / justDevotion,
+      green: overallDevotion.green / justDevotion,
+      colorless: overallDevotion.colorless / justDevotion,
+    };
+
+    groups["manaProposal"] = manaProposal;
 
     groups["landCount"] = landCount;
     groups["cardCount"] = overallCount;
