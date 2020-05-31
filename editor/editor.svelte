@@ -137,7 +137,7 @@
   function remove(card) {
     const r = new RegExp(`^.*${card.name}.*$`, "gm");
 
-    input.value = input.value.replace(r, "");
+    input.value = input.value.replace(r, "// " + card.count + " " + card.name);
     promise = CardLoader.createDeck(input.value || "", (p, a) =>
       sp(p, a)
     ).catch(e => {
