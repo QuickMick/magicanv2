@@ -277,6 +277,7 @@ class MtgInterface {
     let overallCost = 0;
     //mana_cost.split("G").length - 1
     for (let group of groups) {
+      if (group.name.toLowerCase == "maybe") continue;
       group.cards = Object.values(group.deck);
       group.cards = group.cards.sort((a, b) => a.data.cmc > b.data.cmc ? 1 : -1);
 
