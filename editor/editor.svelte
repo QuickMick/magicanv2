@@ -14,6 +14,13 @@
   let statisticsActive = true;
   let scaling = 100;
 
+  let devotionHighlight = -1;
+
+  function highlightDevotion(mana) {
+    if (devotionHighlight == mana) devotionHighlight = -1;
+    else devotionHighlight = mana + "";
+  }
+
   $: {
     const s = Math.floor(scaling || 100) / 100;
     height = _height * s;
@@ -348,6 +355,10 @@ mountain
     border: 6px solid red;
   }
 
+  .card.highlighted {
+    border: 6px solid yellow;
+  }
+
   .card:hover {
     border: 6px solid blue;
     cursor: pointer;
@@ -494,6 +505,23 @@ mountain
   .curve-wrapper {
     width: 20px;
     position: relative;
+    cursor: pointer;
+  }
+
+  .curve-element:hover {
+    background: lightcoral;
+  }
+
+  .highlighted .curve-element {
+    background: lightblue;
+  }
+
+  .curve-label.highlighted {
+    background: lightblue;
+  }
+
+  .curve-label:hover {
+    background: lightcoral;
   }
 
   h4 {
@@ -618,7 +646,10 @@ mountain
                 <div class="all-curves">
                   {#each groups['manaCurve'] as mana, i}
                     {#if mana > 0}
-                      <div class="curve-wrapper">
+                      <div
+                        class="curve-wrapper"
+                        class:highlighted={devotionHighlight == i}
+                        on:click={() => highlightDevotion(i)}>
                         <div
                           class="curve-element"
                           style={'height:' + getHeight(mana, groups) + '%;'}>
@@ -632,7 +663,12 @@ mountain
                 <div class="all-labels">
                   {#each groups['manaCurve'] as mana, i}
                     {#if mana > 0}
-                      <div class="curve-label">{i}</div>
+                      <div
+                        class="curve-label"
+                        class:highlighted={devotionHighlight == i}
+                        on:click={() => highlightDevotion(mana)}>
+                        {i}
+                      </div>
                     {/if}
                   {/each}
                 </div>
@@ -720,6 +756,7 @@ mountain
                 {#each { length: card.count > 4 ? 4 : card.count } as _, i}
                   <img
                     class:banned={card.data.legalities[format.value] !== 'legal'}
+                    class:highlighted={devotionHighlight == card.data.cmc}
                     on:dblclick={() => remove(card)}
                     class="card"
                     style={'margin-top: ' + i * 40 + 'px'}
