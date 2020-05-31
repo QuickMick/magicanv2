@@ -86,6 +86,20 @@
     all = a;
   }
 
+  function sortDeckString() {
+    promise = CardLoader.sort(input.value || "", (p, a) => {
+      sp(p, a);
+    })
+      .catch(e => {
+        console.error(e);
+        throw e;
+      })
+      .then(res => {
+        input.value = res;
+        return update({ keyCode: 27 }, true);
+      });
+  }
+
   async function update(evt) {
     if (evt.keyCode !== 27) return;
     promise = CardLoader.createDeck(input.value || "", (p, a) => {
@@ -99,6 +113,8 @@
         input.value = res.corrected;
         return res;
       });
+
+    return promise;
   }
   function reload() {
     update({ keyCode: 27 });
@@ -650,6 +666,7 @@ mountain
       </div>
 
       <button on:click={toggleStatistics}>toggle statistics</button>
+      <button on:click={sortDeckString}>sort</button>
 
     </div>
     <textarea bind:this={input} class="input" on:keyup={onTyping} />

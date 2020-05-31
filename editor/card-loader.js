@@ -92,6 +92,85 @@ class MtgInterface {
      }*/
   }
 
+  async sort(deckString, update = () => {}) {
+    deckString = deckString.replace(/#.*/gm, "");
+    const deckRaw = deckString.trim().replace(/\((.*?)\)|([0-9]*\n)/g, "\n").replace(/\s*\n+\s*\n+/g, "\n").split("\n");
+
+    let creatures = {};
+    let spells = {};
+    let lands = {};
+    let maybe = [];
+    const errors = [];
+
+
+    let progress = 0;
+    for (let card of deckRaw) {
+
+      let count = Math.floor(((card.match(/(\d+)/) || [])[0] || 1));
+      if (isNaN(count)) {
+        count = 1;
+      }
+      progress++;
+
+      if (card.trim().startsWith("//")) {
+        maybe.push(card.trim());
+        continue;
+      };
+
+      const name = card.replace(/(\d+)/, "").trim();
+      if (!name) continue; // cant work with this data
+      // search the according data
+      try {
+        let data = await this.cardByName(name);
+
+        if (data.type_line.toLowerCase().includes("land")) {
+          lands[data.name] = lands[data.name] || { data, count: 0, name: data.name };
+          lands[data.name].count++;
+        } else if (data.type_line.toLowerCase().includes("creature")) {
+          creatures[data.name] = creatures[data.name] || { data, count: 0, name: data.name };
+          creatures[data.name].count++;
+        } else {
+          spells[data.name] = spells[data.name] || { data, count: 0, name: data.name };
+          spells[data.name].count++;
+        }
+
+      } catch (e) {
+        errors.push(name);
+      }
+      update(progress, deckRaw.length);
+    }
+
+    creatures = Object.values(creatures).sort((a, b) => a.data.cmc > b.data.cmc ? 1 : -1);
+    spells = Object.values(spells).sort((a, b) => a.data.cmc > b.data.cmc ? 1 : -1);
+    lands = Object.values(lands).sort((a, b) => a.name > b.name ? 1 : -1);
+    let output = "# Creatures";
+    for (let cur of creatures) {
+      output += "\n" + cur.count + " " + cur.name;
+    }
+    output += "\n# Spells\n";
+    for (let cur of spells) {
+      output += "\n" + cur.count + " " + cur.name;
+    }
+
+    output += "\n# Lands\n"
+    for (let cur of lands) {
+      output += "\n" + cur.count + " " + cur.name;
+    }
+
+    output += "\n# Maybe\n"
+    for (let cur of maybe) {
+      output += "\n//" + cur;
+    }
+
+    output += "\n# Not Found"
+    for (let cur of errors) {
+      output += "\n//" + cur.count + " " + cur.name;
+    }
+
+
+    return output;
+  }
+
 
   /**
    * converts a deck string to a readable object
@@ -100,8 +179,14 @@ class MtgInterface {
    * @param {String} deckString the complete deck, copied from a site or e.g forge
    * @memberof MtgInterface
    */
-  async createDeck(deckString, update = () => {}) {
+  async createDeck(deckString, update = () => {}, sort = false) {
     // convert the deck string to an array
+
+
+
+
+
+
 
     let groups = [...deckString.match(/#(.*?)(\n|$)/g) || ["main"]];
     const deckRaw = deckString.trim().replace(/\((.*?)\)|([0-9]*\n)/g, "\n").replace(/\s*\n+\s*\n+/g, "\n").split("\n");
@@ -114,22 +199,26 @@ class MtgInterface {
       deckRaw.shift();
     }
 
+
     groups = groups.map(v => { return { deck: {}, name: v.replace("#", "").trim() } });
 
     let curGroup = 0;
 
     let progress = 0;
+    let ignored = 0;
     // iterate each found card
     for (let card of deckRaw) {
       if (!card) continue;
+      if (card.trim().startsWith("//")) continue;
       if (card.includes("#")) {
         curGroup++;
         if (curGroup > groups.length) curGroup = 0;
         continue;
       }
       progress++;
+
       const deck = groups[curGroup].deck;
-      update(progress, deckRaw.length - groups.length + 1);
+      update(progress, deckRaw.length - groups.length + 1 - ignored);
       // extract the count from the string and free the name
 
       let count = Math.floor(((card.match(/(\d+)/) || [])[0] || 1));
