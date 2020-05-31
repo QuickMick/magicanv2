@@ -147,9 +147,16 @@
   }
 
   function copyDeck() {
+    const deck = input.value;
+
+    input.value = input.value.replace(/#.*|\/\/.*/gm, "\n");
+
     input.select();
+
     input.setSelectionRange(0, 99999);
     document.execCommand("copy");
+
+    input.value = deck;
   }
 
   let helpActive = true;
