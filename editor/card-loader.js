@@ -47,6 +47,7 @@ class MtgInterface {
         queries.push("type%3A" + opts.type);
       }
       if (opts.text) {
+        let text = opts.text.trim().replace(/\s+/gm, "+oracle%3A");
         queries.push("oracle%3A" + opts.text);
       }
 
