@@ -147,22 +147,22 @@ class MtgInterface {
     for (let cur of creatures) {
       output += "\n" + cur.count + " " + cur.name;
     }
-    output += "\n# Spells\n";
+    output += "\n\n# Spells";
     for (let cur of spells) {
       output += "\n" + cur.count + " " + cur.name;
     }
 
-    output += "\n# Lands\n"
+    output += "\n\n# Lands"
     for (let cur of lands) {
       output += "\n" + cur.count + " " + cur.name;
     }
 
-    output += "\n# Maybe\n"
+    output += "\n\n# Maybe"
     for (let cur of maybe) {
       output += "\n//" + cur;
     }
 
-    output += "\n# Not Found"
+    output += "\n\n# Not Found"
     for (let cur of errors) {
       output += "\n//" + cur.count + " " + cur.name;
     }
