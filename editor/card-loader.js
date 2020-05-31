@@ -308,17 +308,19 @@ class MtgInterface {
       };
       const manaCurve = [];
       for (let card of group.cards) {
-        count += card.count;
-
-        cost += parseFloat(card.data.prices.usd || 0) * card.count;
-
-        if (card.data.type_line.toLowerCase().includes("land")) {
-          landCount += card.count;
-        } else {
-          manaCurve[card.data.cmc || 0] = (manaCurve[card.data.cmc || 0] || 0) + card.count;
-        }
 
         if (!isMaybe) {
+          count += card.count;
+
+          cost += parseFloat(card.data.prices.usd || 0) * card.count;
+
+          if (card.data.type_line.toLowerCase().includes("land")) {
+            landCount += card.count;
+          } else {
+            manaCurve[card.data.cmc || 0] = (manaCurve[card.data.cmc || 0] || 0) + card.count;
+          }
+
+
           if (card.data.type_line.toLowerCase().includes("creature")) {
             creatureCount += card.count;
           }
