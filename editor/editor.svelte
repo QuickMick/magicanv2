@@ -11,6 +11,7 @@
   let height = _height;
   let width = _width;
   let cardSearchActive = true;
+  let statisticsActive = true;
   let scaling = 100;
 
   $: {
@@ -137,6 +138,10 @@ mountain
     console.log("help:", Cookies.get("helpActive"));
     cardSearchActive = Cookies.set("cardSearchActive") == "true";
     console.log("search:", Cookies.set("cardSearchActive"));
+    statisticsActive = Cookies.set("statisticsActive") == "true";
+    console.log("statistics:", Cookies.set("statisticsActive"));
+
+    statisticsActive;
     input.value = start;
     console.log("STSFSDF", Cookies.get("deck")),
       (promise = CardLoader.createDeck(start, (p, a) => sp(p, a)));
@@ -158,6 +163,10 @@ mountain
   function toggleSearch() {
     cardSearchActive = !cardSearchActive;
     Cookies.set("cardSearchActive", cardSearchActive + "");
+  }
+  function toggleStatistics() {
+    statisticsActive = !statisticsActive;
+    Cookies.set("statisticsActive", statisticsActive + "");
   }
 </script>
 
@@ -547,72 +556,77 @@ mountain
           </div>
           <div>Cost: {groups.cost.toFixed(2) + '$'}</div>
 
-          <div class="statistics">
-            <h4>Devotion</h4>
-            <div class="mana-devotion">
-              <div class="deck-value blue">{groups['mana'].blue}</div>
-              <div class="deck-value black">{groups['mana'].black}</div>
-              <div class="deck-value red">{groups['mana'].red}</div>
-              <div class="deck-value white">{groups['mana'].white}</div>
-              <div class="deck-value green">{groups['mana'].green}</div>
-              <div class="deck-value colorless">{groups['mana'].colorless}</div>
-            </div>
+          {#if statisticsActive}
+            <div class="statistics">
+              <h4>Devotion</h4>
+              <div class="mana-devotion">
+                <div class="deck-value blue">{groups['mana'].blue}</div>
+                <div class="deck-value black">{groups['mana'].black}</div>
+                <div class="deck-value red">{groups['mana'].red}</div>
+                <div class="deck-value white">{groups['mana'].white}</div>
+                <div class="deck-value green">{groups['mana'].green}</div>
+                <div class="deck-value colorless">
+                  {groups['mana'].colorless}
+                </div>
+              </div>
 
-            <h4>Generic Mana</h4>
-            <div>Remaining generic mana costs:{groups['mana'].generic}</div>
-            <div>CMC-Mana-Sum:{groups['mana'].sum}</div>
-            <div>
-              Average CMC per Nonland: {groups['averageMana'].toFixed(2)}
-            </div>
-            <h4>Suggested Mana Distribution</h4>
-            <div class="mana-proposal">
-              <div class="deck-value blue">
-                {(groups['manaProposal'].blue * groups['landCount']).toFixed(1)}
+              <h4>Generic Mana</h4>
+              <div>Remaining generic mana costs:{groups['mana'].generic}</div>
+              <div>CMC-Mana-Sum:{groups['mana'].sum}</div>
+              <div>
+                Average CMC per Nonland: {groups['averageMana'].toFixed(2)}
               </div>
-              <div class="deck-value black">
-                {(groups['manaProposal'].black * groups['landCount']).toFixed(1)}
+              <h4>Suggested Mana Distribution</h4>
+              <div class="mana-proposal">
+                <div class="deck-value blue">
+                  {(groups['manaProposal'].blue * groups['landCount']).toFixed(1)}
+                </div>
+                <div class="deck-value black">
+                  {(groups['manaProposal'].black * groups['landCount']).toFixed(1)}
+                </div>
+                <div class="deck-value red">
+                  {(groups['manaProposal'].red * groups['landCount']).toFixed(1)}
+                </div>
+                <div class="deck-value white">
+                  {(groups['manaProposal'].white * groups['landCount']).toFixed(1)}
+                </div>
+                <div class="deck-value green">
+                  {(groups['manaProposal'].green * groups['landCount']).toFixed(1)}
+                </div>
+                <div class="deck-value colorless">
+                  {(groups['manaProposal'].colorless * groups['landCount']).toFixed(1)}
+                </div>
               </div>
-              <div class="deck-value red">
-                {(groups['manaProposal'].red * groups['landCount']).toFixed(1)}
-              </div>
-              <div class="deck-value white">
-                {(groups['manaProposal'].white * groups['landCount']).toFixed(1)}
-              </div>
-              <div class="deck-value green">
-                {(groups['manaProposal'].green * groups['landCount']).toFixed(1)}
-              </div>
-              <div class="deck-value colorless">
-                {(groups['manaProposal'].colorless * groups['landCount']).toFixed(1)}
-              </div>
-            </div>
-            <h4>Mana Curve</h4>
-            <div class="mana-curve">
-              <div class="all-curves">
-                {#each groups['manaCurve'] as mana, i}
-                  {#if mana > 0}
-                    <div class="curve-wrapper">
-                      <div
-                        class="curve-element"
-                        style={'height:' + getHeight(mana, groups) + '%;'}>
-                        {mana || ''}
+              <h4>Mana Curve</h4>
+              <div class="mana-curve">
+                <div class="all-curves">
+                  {#each groups['manaCurve'] as mana, i}
+                    {#if mana > 0}
+                      <div class="curve-wrapper">
+                        <div
+                          class="curve-element"
+                          style={'height:' + getHeight(mana, groups) + '%;'}>
+                          {mana || ''}
+                        </div>
                       </div>
-                    </div>
-                  {/if}
-                {/each}
-              </div>
+                    {/if}
+                  {/each}
+                </div>
 
-              <div class="all-labels">
-                {#each groups['manaCurve'] as mana, i}
-                  {#if mana > 0}
-                    <div class="curve-label">{i}</div>
-                  {/if}
-                {/each}
+                <div class="all-labels">
+                  {#each groups['manaCurve'] as mana, i}
+                    {#if mana > 0}
+                      <div class="curve-label">{i}</div>
+                    {/if}
+                  {/each}
+                </div>
               </div>
             </div>
-          </div>
+          {/if}
         {/if}
+
       {:catch error}
-        asdasdasasdasd {error}
+        {error}
       {/await}
       Format:
       <select bind:this={format} on:blur={reload} on:change={reload}>
@@ -634,6 +648,9 @@ mountain
         Scale:
         <input type="range" min="25" max="100" bind:value={scaling} />
       </div>
+
+      <button on:click={toggleStatistics}>toggle statistics</button>
+
     </div>
     <textarea bind:this={input} class="input" on:keyup={onTyping} />
   </div>
