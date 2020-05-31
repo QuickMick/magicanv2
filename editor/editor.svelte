@@ -281,13 +281,15 @@ mountain
     padding: 5px;
     color: black;
     border-radius: 50%;
-    width: 25px;
-    height: 25px;
+    width: 15px;
+    height: 15px;
     text-align: center;
     margin: 5px;
     display: flex;
     text-align: center;
     align-items: center;
+    font-size: 11px;
+    font-weight: bold;
   }
   .blue {
     background-color: var(--blue);
@@ -324,7 +326,7 @@ mountain
     display: flex;
     flex-grow: 1;
     flex-direction: row;
-    height: 100px;
+    height: 80px;
   }
 
   .all-labels {
@@ -512,6 +514,7 @@ mountain
         <option>vintage</option>
       </select>
       <div class="slidecontainer">
+        Scale:
         <input type="range" min="25" max="100" bind:value={scaling} />
       </div>
     </div>
