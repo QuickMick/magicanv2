@@ -11,7 +11,7 @@
   let height = _height;
   let width = _width;
 
-  let scaling = 50;
+  let scaling = 100;
 
   $: {
     const s = Math.floor(scaling || 100) / 100;
