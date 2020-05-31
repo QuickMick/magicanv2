@@ -146,6 +146,12 @@
     });
   }
 
+  function copyDeck() {
+    input.select();
+    input.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+  }
+
   let helpActive = true;
   onMount(async () => {
     const start =
@@ -603,6 +609,12 @@ mountain
           <div>
             Lands: {groups['landCount']} Nonlands: {groups['cardCount'] - groups['landCount']}
           </div>
+
+          <div>Creatures: {groups['creatureCount']}</div>
+          <div>Instants: {groups['instantCount']}</div>
+          <div>Enchantments: {groups['enchantmentCount']}</div>
+          <div>Artifacts: {groups['artifactCount']}</div>
+
           <div>Cost: {groups.cost.toFixed(2) + '$'}</div>
 
           {#if statisticsActive}
@@ -708,7 +720,7 @@ mountain
 
       <button on:click={toggleStatistics}>toggle statistics</button>
       <button on:click={sortDeckString}>sort</button>
-
+      <button on:click={copyDeck}>clean copy</button>
     </div>
     <textarea bind:this={input} class="input" on:keyup={onTyping} />
   </div>

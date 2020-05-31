@@ -75,7 +75,7 @@ class MtgInterface {
         }
         return response;
       })
-      .catch(e => { console.log(e); return { code: "not_found" }; });
+      .catch(e => { console.log(e); return { code: "not_found", data: [] }; });
 
   }
 
@@ -279,6 +279,12 @@ class MtgInterface {
 
     let overallCount = 0;
     let overallCost = 0;
+
+    let creatureCount = 0;
+    let instantCount = 0;
+    let enchantmentCount = 0;
+    let artifactCount = 0;
+
     //mana_cost.split("G").length - 1
     for (let group of groups) {
 
@@ -287,6 +293,9 @@ class MtgInterface {
 
       let count = 0;
       let cost = 0;
+      const isMaybe = group.name.toLowerCase() == "maybe";
+
+
       const devotion = {
         blue: 0,
         black: 0,
@@ -303,11 +312,30 @@ class MtgInterface {
 
         cost += parseFloat(card.data.prices.usd || 0) * card.count;
 
-        if (!card.data.type_line.toLowerCase().includes("land")) {
-          manaCurve[card.data.cmc || 0] = (manaCurve[card.data.cmc || 0] || 0) + card.count;
-        } else {
+        if (card.data.type_line.toLowerCase().includes("land")) {
           landCount += card.count;
+        } else {
+          manaCurve[card.data.cmc || 0] = (manaCurve[card.data.cmc || 0] || 0) + card.count;
         }
+
+        if (!isMaybe) {
+          if (card.data.type_line.toLowerCase().includes("creature")) {
+            creatureCount += card.count;
+          }
+          if (card.data.type_line.toLowerCase().includes("artifact")) {
+            artifactCount += card.count;
+          }
+          if (card.data.type_line.toLowerCase().includes("enchantment")) {
+            enchantmentCount += card.count;
+          }
+          if (card.data.type_line.toLowerCase().includes("instant")) {
+            instantCount += card.count;
+          }
+          if (card.data.type_line.toLowerCase().includes("sorcery")) {
+            creatureCount += card.count;
+          }
+        }
+
 
         card.data.mana_cost = card.data.mana_cost || "";
         devotion.blue += (card.data.mana_cost.split("U").length - 1) * card.count;
@@ -320,7 +348,7 @@ class MtgInterface {
         devotion.sum = devotion.blue + devotion.black + devotion.red + devotion.green + devotion.white + devotion.colorless + devotion.generic;
       }
 
-      const isMaybe = group.name.toLowerCase() == "maybe";
+
 
       group.count = count;
       group.mana = devotion;
@@ -375,6 +403,12 @@ class MtgInterface {
     groups["mana"] = overallDevotion;
     groups["corrected"] = deckString;
     groups["manaCurve"] = overallManaCurve;
+
+
+    groups["creatureCount"] = creatureCount;
+    groups["instantCount"] = instantCount;
+    groups["enchantmentCount"] = enchantmentCount;
+    groups["artifactCount"] = artifactCount;
     return groups;
   }
 }
