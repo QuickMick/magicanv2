@@ -277,7 +277,7 @@ class MtgInterface {
     let overallCost = 0;
     //mana_cost.split("G").length - 1
     for (let group of groups) {
-      if (group.name.toLowerCase == "maybe") continue;
+
       group.cards = Object.values(group.deck);
       group.cards = group.cards.sort((a, b) => a.data.cmc > b.data.cmc ? 1 : -1);
 
@@ -315,8 +315,9 @@ class MtgInterface {
         devotion.generic += Math.floor(card.data.mana_cost.replace(/[^0-9.]/g, "") || 0) * card.count;
         devotion.sum = devotion.blue + devotion.black + devotion.red + devotion.green + devotion.white + devotion.colorless + devotion.generic;
       }
-      overallCost += cost;
-      overallCount += count;
+
+      const isMaybe = group.name.toLowerCase() == "maybe";
+
       group.count = count;
       group.mana = devotion;
       group.cost = cost;
@@ -324,18 +325,24 @@ class MtgInterface {
       group.manaCurve = manaCurve;
       for (let i = 0; i < manaCurve.length; i++) {
         manaCurve[i] = manaCurve[i] || 0;
+        if (isMaybe) continue;
         overallManaCurve[i] = (overallManaCurve[i] || 0) + (manaCurve[i] || 0);
       }
+      if (!isMaybe) {
 
-      overallDevotion.blue += devotion.blue;
-      overallDevotion.black += devotion.black;
-      overallDevotion.red += devotion.red;
-      overallDevotion.white += devotion.white;
-      overallDevotion.green += devotion.green;
-      overallDevotion.colorless += devotion.colorless;
+        overallCost += cost;
+        overallCount += count;
 
-      overallDevotion.generic += devotion.generic;
-      overallDevotion.sum += devotion.sum;
+        overallDevotion.blue += devotion.blue;
+        overallDevotion.black += devotion.black;
+        overallDevotion.red += devotion.red;
+        overallDevotion.white += devotion.white;
+        overallDevotion.green += devotion.green;
+        overallDevotion.colorless += devotion.colorless;
+
+        overallDevotion.generic += devotion.generic;
+        overallDevotion.sum += devotion.sum;
+      }
     }
 
     for (let i = 0; i < overallManaCurve.length; i++) {
