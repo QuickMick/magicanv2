@@ -39,6 +39,18 @@
   let spEDHGreen;
   let spEDHColorless;
 
+  function clearForColorless() {
+    spEDHBlue.checked = false;
+    spEDHBlack.checked = false;
+    spEDHRed.checked = false;
+    spEDHWhite.checked = false;
+    spEDHGreen.checked = false;
+  }
+
+  function clearColorless() {
+    spEDHColorless.checked = false;
+  }
+
   function searchCards(nextUrl) {
     if (typeof nextUrl == "string") {
       cardSearchPromise = CardLoader.search(nextUrl);
@@ -724,22 +736,46 @@ mountain
       <div class="search-param color-param">
         Commander-Colors:
         <div class="blue">
-          <input type="checkbox" class="blue" bind:this={spEDHBlue} />
+          <input
+            type="checkbox"
+            on:click={clearColorless}
+            class="blue"
+            bind:this={spEDHBlue} />
         </div>
         <div class="black">
-          <input type="checkbox" class="black" bind:this={spEDHBlack} />
+          <input
+            type="checkbox"
+            on:click={clearColorless}
+            class="black"
+            bind:this={spEDHBlack} />
         </div>
         <div class="red">
-          <input type="checkbox" class="red" bind:this={spEDHRed} />
+          <input
+            type="checkbox"
+            on:click={clearColorless}
+            class="red"
+            bind:this={spEDHRed} />
         </div>
         <div class="white">
-          <input type="checkbox" class="white" bind:this={spEDHWhite} />
+          <input
+            type="checkbox"
+            on:click={clearColorless}
+            class="white"
+            bind:this={spEDHWhite} />
         </div>
         <div class="green">
-          <input type="checkbox" class="green" bind:this={spEDHGreen} />
+          <input
+            type="checkbox"
+            on:click={clearColorless}
+            class="green"
+            bind:this={spEDHGreen} />
         </div>
         <div class="colorless">
-          <input type="checkbox" class="colorless" bind:this={spEDHColorless} />
+          <input
+            type="checkbox"
+            on:click={clearForColorless}
+            class="colorless"
+            bind:this={spEDHColorless} />
         </div>
       </div>
       <button on:click={searchCards}>search</button>
