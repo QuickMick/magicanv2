@@ -69,6 +69,7 @@
     });
   }
 
+  let helpActive = true;
   onMount(async () => {
     const start =
       Cookies.get("deck") ||
@@ -79,6 +80,7 @@ mountain
 # main deck
 20 blightsteel colossus`;
 
+    helpActive = Cookies.get("helpActive") == "true";
     input.value = start;
     console.log("STSFSDF", Cookies.get("deck")),
       (promise = CardLoader.createDeck(start, (p, a) => sp(p, a)));
@@ -90,6 +92,11 @@ mountain
 
   function getHeight(mana, groups) {
     return 100 * (mana / Math.max(...groups["manaCurve"]));
+  }
+
+  function openHelp() {
+    helpActive = !helpActive;
+    Cookies.set("helpActive", helpActive + "");
   }
 </script>
 
@@ -111,6 +118,24 @@ mountain
     width: 100%;
     height: 100%;
   }
+
+  .help-symbol {
+    border-radius: 50%;
+    border: 1px solid black;
+    width: 16px;
+    height: 16px;
+    text-align: center;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    cursor: pointer;
+  }
+
+  .help-symbol:hover {
+    border-color: blue;
+    color: blue;
+  }
+
   .statistics {
     display: flex;
     flex-direction: column;
@@ -135,6 +160,7 @@ mountain
   .help {
     padding: 0px 10px 10px 10px;
     user-select: none;
+    position: relative;
   }
 
   .group-content {
@@ -203,7 +229,13 @@ mountain
   }
 
   .banned-text {
-    bottom: 135px;
+    font-size: 100%;
+    text-shadow: 0px 0px 9px black;
+    color: red;
+    position: absolute;
+    z-index: 100;
+    font-weight: bold;
+    left: 17%;
   }
   .count {
     top: 165px;
@@ -214,7 +246,7 @@ mountain
     color: wheat;
     font-size: 12px;
     background: black;
-    left: 109px;
+    left: 45%;
     font-weight: normal;
   }
 
@@ -363,7 +395,9 @@ mountain
 <div class="content">
   <div class="controls">
     <div class="help">
-      {#await promise}
+      <div class="help-symbol" on:click={openHelp}>?</div>
+
+      {#if helpActive}
         <h4>How to use:</h4>
         <p>paste your deck to the following input.</p>
         <ul>
@@ -378,77 +412,86 @@ mountain
         </ul>
         <p>NOTE: we use cookies to store your deck after reload.</p>
         <p>NOTE: This is not an official Magic produkt.</p>
+      {/if}
+
+      {#await promise}
 
         <div>loading: {progress}/{all}</div>
       {:then groups}
-        <div>Total cards: {groups['cardCount']}</div>
-        <div>
-          Lands: {groups['landCount']} Nonlands: {groups['cardCount'] - groups['landCount']}
-        </div>
-        <div>Cost: {groups.cost.toFixed(2) + '$'}</div>
 
-        <div class="statistics">
-          <h4>Devotion</h4>
-          <div class="mana-devotion">
-            <div class="deck-value blue">{groups['mana'].blue}</div>
-            <div class="deck-value black">{groups['mana'].black}</div>
-            <div class="deck-value red">{groups['mana'].red}</div>
-            <div class="deck-value white">{groups['mana'].white}</div>
-            <div class="deck-value green">{groups['mana'].green}</div>
-            <div class="deck-value colorless">{groups['mana'].colorless}</div>
-          </div>
+        {#if !helpActive}
+          <h4>General</h4>
 
-          <h4>Generic Mana</h4>
-          <div>Remaining generic mana costs:{groups['mana'].generic}</div>
-          <div>CMC-Mana-Sum:{groups['mana'].sum}</div>
-          <div>Average CMC per Nonland: {groups['averageMana'].toFixed(2)}</div>
-          <h4>Suggested Mana Distribution</h4>
-          <div class="mana-proposal">
-            <div class="deck-value blue">
-              {(groups['manaProposal'].blue * groups['landCount']).toFixed(1)}
-            </div>
-            <div class="deck-value black">
-              {(groups['manaProposal'].black * groups['landCount']).toFixed(1)}
-            </div>
-            <div class="deck-value red">
-              {(groups['manaProposal'].red * groups['landCount']).toFixed(1)}
-            </div>
-            <div class="deck-value white">
-              {(groups['manaProposal'].white * groups['landCount']).toFixed(1)}
-            </div>
-            <div class="deck-value green">
-              {(groups['manaProposal'].green * groups['landCount']).toFixed(1)}
-            </div>
-            <div class="deck-value colorless">
-              {(groups['manaProposal'].colorless * groups['landCount']).toFixed(1)}
-            </div>
+          <div>Total cards: {groups['cardCount']}</div>
+          <div>
+            Lands: {groups['landCount']} Nonlands: {groups['cardCount'] - groups['landCount']}
           </div>
-          <h4>Mana Curve</h4>
-          <div class="mana-curve">
-            <div class="all-curves">
-              {#each groups['manaCurve'] as mana, i}
-                {#if mana > 0}
-                  <div class="curve-wrapper">
-                    <div
-                      class="curve-element"
-                      style={'height:' + getHeight(mana, groups) + '%;'}>
-                      {mana || ''}
+          <div>Cost: {groups.cost.toFixed(2) + '$'}</div>
+
+          <div class="statistics">
+            <h4>Devotion</h4>
+            <div class="mana-devotion">
+              <div class="deck-value blue">{groups['mana'].blue}</div>
+              <div class="deck-value black">{groups['mana'].black}</div>
+              <div class="deck-value red">{groups['mana'].red}</div>
+              <div class="deck-value white">{groups['mana'].white}</div>
+              <div class="deck-value green">{groups['mana'].green}</div>
+              <div class="deck-value colorless">{groups['mana'].colorless}</div>
+            </div>
+
+            <h4>Generic Mana</h4>
+            <div>Remaining generic mana costs:{groups['mana'].generic}</div>
+            <div>CMC-Mana-Sum:{groups['mana'].sum}</div>
+            <div>
+              Average CMC per Nonland: {groups['averageMana'].toFixed(2)}
+            </div>
+            <h4>Suggested Mana Distribution</h4>
+            <div class="mana-proposal">
+              <div class="deck-value blue">
+                {(groups['manaProposal'].blue * groups['landCount']).toFixed(1)}
+              </div>
+              <div class="deck-value black">
+                {(groups['manaProposal'].black * groups['landCount']).toFixed(1)}
+              </div>
+              <div class="deck-value red">
+                {(groups['manaProposal'].red * groups['landCount']).toFixed(1)}
+              </div>
+              <div class="deck-value white">
+                {(groups['manaProposal'].white * groups['landCount']).toFixed(1)}
+              </div>
+              <div class="deck-value green">
+                {(groups['manaProposal'].green * groups['landCount']).toFixed(1)}
+              </div>
+              <div class="deck-value colorless">
+                {(groups['manaProposal'].colorless * groups['landCount']).toFixed(1)}
+              </div>
+            </div>
+            <h4>Mana Curve</h4>
+            <div class="mana-curve">
+              <div class="all-curves">
+                {#each groups['manaCurve'] as mana, i}
+                  {#if mana > 0}
+                    <div class="curve-wrapper">
+                      <div
+                        class="curve-element"
+                        style={'height:' + getHeight(mana, groups) + '%;'}>
+                        {mana || ''}
+                      </div>
                     </div>
-                  </div>
-                {/if}
-              {/each}
-            </div>
+                  {/if}
+                {/each}
+              </div>
 
-            <div class="all-labels">
-              {#each groups['manaCurve'] as mana, i}
-                {#if mana > 0}
-                  <div class="curve-label">{i}</div>
-                {/if}
-              {/each}
+              <div class="all-labels">
+                {#each groups['manaCurve'] as mana, i}
+                  {#if mana > 0}
+                    <div class="curve-label">{i}</div>
+                  {/if}
+                {/each}
+              </div>
             </div>
           </div>
-        </div>
-
+        {/if}
       {:catch error}
         asdasdasasdasd {error}
       {/await}
@@ -501,8 +544,8 @@ mountain
               <div class="group-value white">{group.mana.white}</div>
               <div class="group-value green">{group.mana.green}</div>
               <div class="group-value colorless">{group.mana.colorless}</div>
-              generic:
-              <div class="group-value generic">{group.mana.generic}</div>
+              <!-- generic:
+              <div class="group-value generic">{group.mana.generic}</div> -->
               sum:
               <div class="group-value sum">{group.mana.sum}</div>
               <div class="group-value group-cost">
@@ -539,7 +582,10 @@ mountain
                   <div class="count">{card.count}x</div>
                 {/if}
 
-                <div class="price">{card.data.prices.usd + '$' || '???'}</div>
+                {#if scaling > 90}
+                  <div class="price">{card.data.prices.usd + '$' || '???'}</div>
+                {/if}
+
               </div>
             {/each}
           </div>
