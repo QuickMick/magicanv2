@@ -15,6 +15,66 @@ class MtgInterface {
     this.__cache = {};
   }
 
+  search(opts = {}) {
+    // https://api.scryfall.com/cards/search?order=cmc&q=c%3Ared+pow%3D3 
+    // https://scryfall.com/search?as=grid&order=name&q=myr+oracle%3Atoken+type%3Acreature+commander%3AWUBRG
+
+    let baseurl;
+
+    if (typeof opts != "string") {
+      baseurl = `https://api.scryfall.com/cards/search?${opts.page?"page="+opts.page+"&":""}order=cmc&q=`;
+      const queries = [];
+
+      if (opts.name) {
+        queries.push(opts.name);
+      }
+
+      if (opts.edhcolors && opts.edhcolors.size) {
+        let cs = "";
+        for (let color of opts.edhcolors) {
+          color = color.toUpperCase();
+          if (color === "C") {
+            cs = "C";
+            break;
+          }
+          cs += color;
+        }
+        queries.push("commander%3A" + cs);
+      }
+
+
+      if (opts.type) {
+        queries.push("type%3A" + opts.type);
+      }
+      if (opts.text) {
+        queries.push("oracle%3A" + opts.text);
+      }
+
+      baseurl = baseurl + queries.join("+");
+    } else {
+      baseurl = opts;
+    }
+    return fetch(baseurl)
+      .then(response => response.json())
+      .then(response => {
+        for (let c of response.data) {
+          console.log("c", c);
+          if (!c.image_uris) {
+            if (c.card_faces) {
+              c.image_uris = c.card_faces[0].image_uris;
+              const biu = c.card_faces[1].image_uris;
+              c.backside = biu ? biu.border_crop || biu.normal : "";
+            }
+          }
+          c.url = c ? c.image_uris.border_crop || c.image_uris.normal : "";
+          this.__cache[c.name] = c;
+        }
+        return response;
+      })
+      .catch(e => { console.log(e); return { code: "not_found" }; });
+
+  }
+
   async cardByName(name) {
     if (this.__cache[name]) return this.__cache[name];
     await timeout();
@@ -24,7 +84,7 @@ class MtgInterface {
       .then(response => response.json()).catch(e => { console.log(e); return { code: "not_found" }; });
 
     this.__cache[name] = result;
-
+    this.__cache[result.name] = result;
     return result;
     // .then(data => console.log(data));
     /* for (let card of CARD_DATA) {

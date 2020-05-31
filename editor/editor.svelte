@@ -10,7 +10,7 @@
 
   let height = _height;
   let width = _width;
-
+  let cardSearchActive = true;
   let scaling = 100;
 
   $: {
@@ -20,11 +20,44 @@
   }
 
   let promise = new Promise(resolve => resolve([]));
+  let cardSearchPromise = new Promise(resolve =>
+    resolve({ data: {}, has_more: false, total_cards: 0 })
+  );
 
   let input;
   let format;
   let progress = 0;
   let all = 0;
+
+  let spName;
+  let spText;
+
+  let spEDHBlue;
+  let spEDHBlack;
+  let spEDHRed;
+  let spEDHWhite;
+  let spEDHGreen;
+  let spEDHColorless;
+
+  function searchCards(nextUrl) {
+    if (typeof nextUrl == "string") {
+      cardSearchPromise = CardLoader.search(nextUrl);
+      return;
+    }
+    const colors = new Set();
+    if (spEDHColorless.checked) colors.add("C");
+    if (spEDHBlue.checked) colors.add("U");
+    if (spEDHBlack.checked) colors.add("B");
+    if (spEDHRed.checked) colors.add("R");
+    if (spEDHWhite.checked) colors.add("W");
+    if (spEDHGreen.checked) colors.add("G");
+
+    cardSearchPromise = CardLoader.search({
+      name: spName.value,
+      text: spText.value,
+      edhcolors: colors
+    });
+  }
 
   let hiddenGroups = new Set();
 
@@ -57,6 +90,14 @@
   function reload() {
     update({ keyCode: 27 });
   }
+
+  function appendCard(name) {
+    if (!name) return;
+
+    input.value = input.value + "\n1 " + name;
+    reload();
+  }
+
   function remove(card) {
     const r = new RegExp(`^.*${card.name}.*$`, "gm");
 
@@ -81,6 +122,7 @@ mountain
 20 blightsteel colossus`;
 
     helpActive = Cookies.get("helpActive") == "true";
+    cardSearchActive = Cookies.set("cardSearchActive") == "true";
     input.value = start;
     console.log("STSFSDF", Cookies.get("deck")),
       (promise = CardLoader.createDeck(start, (p, a) => sp(p, a)));
@@ -97,6 +139,11 @@ mountain
   function openHelp() {
     helpActive = !helpActive;
     Cookies.set("helpActive", helpActive + "");
+  }
+
+  function toggleSearch() {
+    cardSearchActive = !cardSearchActive;
+    Cookies.set("cardSearchActive", cardSearchActive + "");
   }
 </script>
 
@@ -134,6 +181,21 @@ mountain
   .help-symbol:hover {
     border-color: blue;
     color: blue;
+  }
+
+  .toggle-search {
+    background: blue;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    position: absolute;
+    left: -30px;
+    top: 50%;
+    user-select: none;
+  }
+
+  .hide .toggle-search {
+    left: -52px;
   }
 
   .statistics {
@@ -175,6 +237,41 @@ mountain
     height: 45px;
   }
 
+  .card-search {
+    height: 100%;
+    flex-grow: 1;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    right: 0;
+    width: 33%;
+    z-index: 100;
+    box-shadow: 0px 0px 10px black;
+  }
+
+  .card-search.hide {
+    right: -33%;
+  }
+
+  .search-params {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .search-result {
+    height: 100%;
+    flex-grow: 1;
+    background: white;
+    display: flex;
+    flex-direction: row;
+    overflow: auto;
+    position: relative;
+    user-select: none;
+    flex-wrap: wrap;
+  }
+
   .display {
     flex-grow: 1;
     background: gray;
@@ -198,6 +295,7 @@ mountain
   .entry {
     position: relative;
     padding: 10px;
+    flex-shrink: 0;
   }
   .card {
     position: absolute;
@@ -315,6 +413,11 @@ mountain
   }
   .sum {
     background-color: goldenrod;
+  }
+
+  .color-param {
+    display: flex;
+    flex-direction: row;
   }
 
   .mana-curve {
@@ -602,5 +705,88 @@ mountain
         brudi
       </div>
     {/await}
+  </div>
+
+  <div class="card-search" class:hide={!cardSearchActive}>
+    <div class="toggle-search" on:click={toggleSearch}>x</div>
+    <div class="search-params">
+      <div class="search-param">
+        Name:
+        <input bind:this={spName} />
+      </div>
+      <div class="search-param">
+        Text:
+        <input bind:this={spText} />
+      </div>
+
+      <div class="search-param color-param">
+        Commander-Colors:
+        <div class="blue">
+          <input type="checkbox" class="blue" bind:this={spEDHBlue} />
+        </div>
+        <div class="black">
+          <input type="checkbox" class="black" bind:this={spEDHBlack} />
+        </div>
+        <div class="red">
+          <input type="checkbox" class="red" bind:this={spEDHRed} />
+        </div>
+        <div class="white">
+          <input type="checkbox" class="white" bind:this={spEDHWhite} />
+        </div>
+        <div class="green">
+          <input type="checkbox" class="green" bind:this={spEDHGreen} />
+        </div>
+        <div class="colorless">
+          <input type="checkbox" class="colorless" bind:this={spEDHColorless} />
+        </div>
+      </div>
+      <button on:click={searchCards}>search</button>
+    </div>
+
+    {#await cardSearchPromise}
+      <div class="loading-wrapper">
+        <div class="lds-ripple">
+          <div />
+          <div />
+        </div>
+      </div>
+    {:then result}
+      <div class="search-result">
+        {#each result.data as card}
+          <div
+            class="entry"
+            style={'width:' + width + 'px; height:' + height + 'px;'}>
+            <img
+              on:dblclick={() => appendCard(card.name)}
+              class:banned={card.legalities[format.value] !== 'legal'}
+              class="card"
+              src={card.url}
+              alt={card.name}
+              {width}
+              {height} />
+
+            {#if card.legalities[format.value] !== 'legal'}
+              <div class="banned-text">BANNED</div>
+            {/if}
+            {#if scaling > 90}
+              <div class="price">{card.prices.usd + '$' || '???'}</div>
+            {/if}
+          </div>
+        {:else}
+          <div>No cards found</div>
+        {/each}
+      </div>
+      <button
+        disabled={!result.has_more}
+        on:click={() => searchCards(result.next_page)}>
+        next
+      </button>
+    {:catch error}
+      <div class="error">
+        ERROR, check your decklist for correct format or internet connection
+        brudi
+      </div>
+    {/await}
+
   </div>
 </div>
