@@ -14,6 +14,8 @@
   let statisticsActive = true;
   let scaling = 100;
 
+  let display;
+
   let devotionHighlight = -1;
 
   function highlightDevotion(mana) {
@@ -39,6 +41,7 @@
 
   let spName;
   let spText;
+  let spType;
 
   let spEDHBlue;
   let spEDHBlack;
@@ -124,6 +127,7 @@
     cardSearchPromise = CardLoader.search({
       name: spName.value,
       text: spText.value,
+      type: spType.value,
       edhcolors: colors
     });
   }
@@ -208,6 +212,12 @@
 
   async function update(evt) {
     if (evt.keyCode !== 27) return;
+
+    let scrollPosition = 0;
+    if (display) {
+      scrollPosition = display.scrollTop;
+    }
+
     promise = CardLoader.createDeck(input.value || "", (p, a) => {
       resetDeckSearch();
       sp(p, a);
@@ -218,6 +228,10 @@
       })
       .then(res => {
         input.value = res.corrected;
+
+        setTimeout(() => {
+          display.scrollTop = scrollPosition;
+        });
         return res;
       });
 
@@ -876,7 +890,7 @@ mountain
     <textarea bind:this={input} class="input" on:keyup={onTyping} />
   </div>
 
-  <div class="display">
+  <div class="display" bind:this={display}>
     {#await promise}
       <div class="loading-wrapper">
         <div>loading: {progress}/{all}</div>
@@ -970,6 +984,10 @@ mountain
       <div class="search-param">
         Text:
         <input bind:this={spText} />
+      </div>
+      <div class="search-param">
+        Type:
+        <input bind:this={spType} />
       </div>
 
       <div class="search-param color-param">

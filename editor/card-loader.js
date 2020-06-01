@@ -44,7 +44,8 @@ class MtgInterface {
 
 
       if (opts.type) {
-        queries.push("type%3A" + opts.type);
+        let type = opts.type.trim().replace(/\s+/gm, "+type%3A");
+        queries.push("type%3A" + type);
       }
       if (opts.text) {
         let text = opts.text.trim().replace(/\s+/gm, "+oracle%3A");
@@ -55,6 +56,7 @@ class MtgInterface {
     } else {
       baseurl = opts;
     }
+    console.log("searchquery", baseurl);
     return fetch(baseurl)
       .then(async response => {
         const a = await response.json();
