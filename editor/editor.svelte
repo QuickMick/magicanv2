@@ -57,9 +57,11 @@
 
     s = s
       .trim()
+      .replace(/\s\s+/gm, " ")
       .toLowerCase()
-      .split("+")
-      .join("|");
+      .replace(/\s/gm, "(.|\n)*");
+    /*    .split("+")
+      .join("|");*/
     console.log("search:", s);
     const result = [];
     let count = 0;
@@ -759,13 +761,18 @@ mountain
           search:
           <input
             bind:this={deckSearchInput}
+            title="e.g.: sacrifice a (artifact|creature)"
             on:keyup={() => changeDeckSearch(groups)} />
         </div>
       {:catch error}
         {error}
       {/await}
       Format:
-      <select bind:this={format} on:blur={reload} on:change={reload}>
+      <select
+        bind:this={format}
+        on:blur={reload}
+        on:change={reload}
+        title="select the legality checker">
         <option selected>commander</option>
         <option>brawl</option>
         <option>duel</option>
@@ -782,12 +789,31 @@ mountain
       </select>
       <div class="slidecontainer">
         Scale:
-        <input type="range" min="25" max="100" bind:value={scaling} />
+        <input
+          type="range"
+          min="25"
+          max="100"
+          bind:value={scaling}
+          title="scales the card size in the right view" />
       </div>
 
-      <button on:click={toggleStatistics}>toggle statistics</button>
-      <button on:click={sortDeckString}>sort</button>
-      <button on:click={copyDeck}>clean copy</button>
+      <button
+        on:click={toggleStatistics}
+        title="toggles the visibility of the statisticks">
+        {statisticsActive ? 'hide statistics' : 'show statistics'}
+      </button>
+      <button
+        on:click={sortDeckString}
+        title="this sorts the deck to lands spells and creatures -NOTE: your
+        groups will be replaced">
+        sort
+      </button>
+      <button
+        on:click={copyDeck}
+        title="this copies the deck without groups and stuff to your clipboard">
+        clean copy
+      </button>
+      <button on:click={reload}>refresh</button>
     </div>
     <textarea bind:this={input} class="input" on:keyup={onTyping} />
   </div>
