@@ -142,6 +142,7 @@
 
   function resetDeckSearch() {
     deckSeach = null;
+    if (!deckSearchInput) return;
     deckSearchInput.value = "";
   }
   function sortDeckString() {
