@@ -323,7 +323,6 @@ class MtgInterface {
 
 
           if (card.data.type_line.toLowerCase().includes("creature")) {
-            console.log("creature", card.name, card.count);
             creatureCount += card.count;
           }
           if (card.data.type_line.toLowerCase().includes("artifact")) {
