@@ -311,9 +311,9 @@ class MtgInterface {
       };
       const manaCurve = [];
       for (let card of group.cards) {
-
+        count += card.count;
         if (!isMaybe) {
-          count += card.count;
+
 
           cost += parseFloat(card.data.prices.usd || 0) * card.count;
 
