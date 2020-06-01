@@ -260,7 +260,7 @@
     input.value = deck;
   }
 
-  let helpActive = true;
+  let helpActive = false;
   onMount(async () => {
     const start =
       Cookies.get("deck") ||
@@ -271,8 +271,8 @@ mountain
 # main deck
 20 blightsteel colossus`;
 
-    helpActive = Cookies.get("helpActive") == "true";
-    console.log("help:", Cookies.get("helpActive"));
+    //  helpActive = Cookies.get("helpActive") == "true";
+    // console.log("help:", Cookies.get("helpActive"));
     cardSearchActive = Cookies.set("cardSearchActive") == "true";
     console.log("search:", Cookies.set("cardSearchActive"));
     statisticsActive = Cookies.set("statisticsActive") == "true";
@@ -294,7 +294,7 @@ mountain
 
   function openHelp() {
     helpActive = !helpActive;
-    Cookies.set("helpActive", helpActive + "");
+    //  Cookies.set("helpActive", helpActive + "");
   }
 
   function toggleSearch() {
