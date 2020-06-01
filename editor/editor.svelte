@@ -162,6 +162,50 @@
       });
   }
 
+  let deckNameInput;
+  function saveDeck() {
+    if (!deckNameInput) return;
+    const filename = (deckNameInput.value || "unknown deck") + ".txt";
+    const deck = input.value;
+    const blob = new Blob([deck], { type: "text/plain;charset=utf-8" });
+    if (window.navigator.msSaveOrOpenBlob)
+      // IE10+
+      window.navigator.msSaveOrOpenBlob(blob, filename);
+    else {
+      // Others
+      var a = document.createElement("a"),
+        url = URL.createObjectURL(blob);
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function() {
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      }, 0);
+    }
+  }
+
+  function onDeckNameType() {
+    Cookies.set("deckName", deckNameInput.value);
+  }
+
+  function mainKeyDown(evt) {
+    if (evt.ctrlKey || evt.metaKey) {
+      switch (evt.which) {
+        case 83: // s
+          evt.preventDefault();
+          evt.stopPropagation();
+          saveDeck();
+          break;
+      }
+    }
+  }
+
+  function mainKeyUp(evt) {
+    update(evt);
+  }
+
   async function update(evt) {
     if (evt.keyCode !== 27) return;
     promise = CardLoader.createDeck(input.value || "", (p, a) => {
@@ -638,7 +682,7 @@ mountain
   }
 </style>
 
-<svelte:window on:keyup={update} />
+<svelte:window on:keyup={mainKeyUp} on:keydown={mainKeyDown} />
 <div class="content">
   <div class="controls">
     <div class="help">
@@ -797,7 +841,20 @@ mountain
           bind:value={scaling}
           title="scales the card size in the right view" />
       </div>
-
+      <div class="save-container">
+        Save :
+        <input
+          bind:this={deckNameInput}
+          on:keyup={onDeckNameType}
+          value={Cookies.get('deckName') || 'unknown_deck'}
+          title="The name of the deck for saving" />
+        <button
+          on:click={saveDeck}
+          title="this will download you a file, called like you provide in the
+          deck">
+          save
+        </button>
+      </div>
       <button
         on:click={toggleStatistics}
         title="toggles the visibility of the statisticks">
