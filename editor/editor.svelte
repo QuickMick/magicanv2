@@ -676,6 +676,7 @@ mountain
 
           <div>Creatures: {groups['creatureCount']}</div>
           <div>Instants: {groups['instantCount']}</div>
+          <div>Sorceries: {groups['sorceryCount']}</div>
           <div>Enchantments: {groups['enchantmentCount']}</div>
           <div>Artifacts: {groups['artifactCount']}</div>
 

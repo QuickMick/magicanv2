@@ -282,6 +282,7 @@ class MtgInterface {
 
     let creatureCount = 0;
     let instantCount = 0;
+    let sorceryCount = 0;
     let enchantmentCount = 0;
     let artifactCount = 0;
 
@@ -322,6 +323,7 @@ class MtgInterface {
 
 
           if (card.data.type_line.toLowerCase().includes("creature")) {
+            console.log("creature", card.name, card.count);
             creatureCount += card.count;
           }
           if (card.data.type_line.toLowerCase().includes("artifact")) {
@@ -334,7 +336,7 @@ class MtgInterface {
             instantCount += card.count;
           }
           if (card.data.type_line.toLowerCase().includes("sorcery")) {
-            creatureCount += card.count;
+            sorceryCount += card.count;
           }
         }
 
@@ -409,6 +411,7 @@ class MtgInterface {
 
     groups["creatureCount"] = creatureCount;
     groups["instantCount"] = instantCount;
+    groups["sorceryCount"] = sorceryCount;
     groups["enchantmentCount"] = enchantmentCount;
     groups["artifactCount"] = artifactCount;
     return groups;
