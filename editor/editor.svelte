@@ -47,6 +47,53 @@
   let spEDHGreen;
   let spEDHColorless;
 
+  let deckSeach = null;
+  let deckSearchInput;
+
+  function changeDeckSearch(groups) {
+    if (!groups) returndeckSeach = null;
+    let s = deckSearchInput.value;
+    if (!s) return (deckSeach = null);
+
+    s = s
+      .trim()
+      .toLowerCase()
+      .split("+")
+      .join("|");
+    console.log("search:", s);
+    const result = [];
+    let count = 0;
+    const r = new RegExp(s, "gm");
+    for (let group of groups) {
+      for (let card of group.cards) {
+        if (!card || !card.data || !card.data.oracle_text) continue;
+        if (!card.data.oracle_text.toLowerCase().match(r)) continue;
+        count += card.count;
+        result.push(card);
+      }
+    }
+
+    deckSeach = [
+      {
+        cards: result,
+        cost: 0,
+        count,
+        deck: {},
+        mana: {
+          black: 0,
+          blue: 0,
+          colorless: 0,
+          generic: 240,
+          green: 0,
+          red: 0,
+          sum: 240,
+          white: 0
+        },
+        manaCurve: [],
+        name: "search result"
+      }
+    ];
+  }
   function clearForColorless() {
     spEDHBlue.checked = false;
     spEDHBlack.checked = false;
@@ -93,8 +140,13 @@
     all = a;
   }
 
+  function resetDeckSearch() {
+    deckSeach = null;
+    deckSearchInput.value = "";
+  }
   function sortDeckString() {
     promise = CardLoader.sort(input.value || "", (p, a) => {
+      resetDeckSearch();
       sp(p, a);
     })
       .catch(e => {
@@ -110,6 +162,7 @@
   async function update(evt) {
     if (evt.keyCode !== 27) return;
     promise = CardLoader.createDeck(input.value || "", (p, a) => {
+      resetDeckSearch();
       sp(p, a);
     })
       .catch(e => {
@@ -124,12 +177,13 @@
     return promise;
   }
   function reload() {
+    resetDeckSearch();
     update({ keyCode: 27 });
   }
 
   function appendCard(name) {
     if (!name) return;
-
+    resetDeckSearch();
     input.value = input.value + "\n1 " + name;
     reload();
   }
@@ -700,7 +754,12 @@ mountain
             </div>
           {/if}
         {/if}
-
+        <div>
+          search:
+          <input
+            bind:this={deckSearchInput}
+            on:keyup={() => changeDeckSearch(groups)} />
+        </div>
       {:catch error}
         {error}
       {/await}
@@ -743,7 +802,7 @@ mountain
       </div>
     {:then groups}
 
-      {#each groups || [] as group}
+      {#each deckSeach || groups || [] as group}
         <div class="group">
 
           <div class="group-header">
