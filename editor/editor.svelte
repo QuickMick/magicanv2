@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import CardLoader from "./card-loader.js";
-
+  import LZUTF8 from "lzutf8";
   import Cookies from "js-cookie";
 
   const CARD_RATIO = 0.71764705882;
@@ -272,11 +272,13 @@
     document.execCommand("copy");
 
     input.value = deck;
+
+    alert("Deck copied to clipboard");
   }
 
   let helpActive = false;
   onMount(async () => {
-    const start =
+    let start =
       Cookies.get("deck") ||
       `#lands
 mountain
@@ -284,6 +286,26 @@ mountain
 3 swamps
 # main deck
 20 blightsteel colossus`;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const sharedDeck = urlParams.get("d");
+
+    if (sharedDeck) {
+      const buffer = new Uint8Array(sharedDeck.split(","));
+      const decompressed = LZUTF8.decompress(buffer);
+      if (decompressed) {
+        start = decompressed;
+      }
+    }
+
+    urlParams.delete("d");
+    window.history.replaceState({}, "", `${window.location.pathname}`);
+
+    //    window.history.replaceState(
+    //   {},
+    //   '',
+    //   `${window.location.pathname}?${params}${window.location.hash}`,
+    // )
 
     //  helpActive = Cookies.get("helpActive") == "true";
     // console.log("help:", Cookies.get("helpActive"));
@@ -297,6 +319,24 @@ mountain
     console.log("STSFSDF", Cookies.get("deck")),
       (promise = CardLoader.createDeck(start, (p, a) => sp(p, a)));
   });
+
+  function shareDeck() {
+    if (!input || !input.value) {
+      alert("The deck is empty, nothing copied");
+      return;
+    }
+    const compressed = LZUTF8.compress(input.value || "empty deck shared");
+    //window.history.pushState("page2", "Title", "?d=" + compressed);
+    console.log(`${window.location.pathname}?d=${compressed}`);
+
+    const el = document.createElement("textarea");
+    el.value = `${window.location.pathname}?d=${compressed}`;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand("copy");
+    document.body.removeChild(el);
+    alert("link to deck copied");
+  }
 
   function onTyping() {
     Cookies.set("deck", input.value, { expires: 7 });
@@ -885,6 +925,13 @@ mountain
         title="this copies the deck without groups and stuff to your clipboard">
         clean copy
       </button>
+      <button
+        on:click={shareDeck}
+        title="copies a string to your clipboard, that shares this deck with
+        others">
+        share
+      </button>
+
       <button on:click={reload}>refresh</button>
     </div>
     <textarea bind:this={input} class="input" on:keyup={onTyping} />

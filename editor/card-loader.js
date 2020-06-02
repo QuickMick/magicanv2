@@ -314,7 +314,6 @@ class MtgInterface {
         count += card.count;
         if (!isMaybe) {
 
-
           cost += parseFloat(card.data.prices.usd || 0) * card.count;
 
           if (card.data.type_line.toLowerCase().includes("land")) {
@@ -322,7 +321,6 @@ class MtgInterface {
           } else {
             manaCurve[card.data.cmc || 0] = (manaCurve[card.data.cmc || 0] || 0) + card.count;
           }
-
 
           if (card.data.type_line.toLowerCase().includes("creature")) {
             creatureCount += card.count;
