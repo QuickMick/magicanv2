@@ -330,7 +330,7 @@ mountain
     console.log(`${window.location.pathname}?d=${compressed}`);
 
     const el = document.createElement("textarea");
-    el.value = `${window.location.origin}?d=${compressed}`;
+    el.value = `${window.location.href}?d=${compressed}`;
     document.body.appendChild(el);
     el.select();
     document.execCommand("copy");
