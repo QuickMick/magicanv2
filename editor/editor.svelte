@@ -149,9 +149,9 @@
   }
 
   let currentCardContext = null;
-  function cardContextMenu(evt, card) {
+  function cardContextMenu(evt, card, groups) {
     evt.preventDefault();
-    if (evt.which == 3) {
+    if (evt.which == 3 && groups.length > 1) {
       // right click
       currentCardContext = card;
     }
@@ -1115,7 +1115,7 @@ mountain
                   <img
                     class:banned={card.data.legalities[format.value] !== 'legal'}
                     class:highlighted={devotionHighlight == card.data.cmc}
-                    on:mouseup|stopPropagation={evt => cardContextMenu(evt, card)}
+                    on:mouseup|stopPropagation={evt => cardContextMenu(evt, card, groups)}
                     on:dblclick={() => remove(card)}
                     class="card"
                     style={'margin-top: ' + i * 40 + 'px'}
