@@ -239,7 +239,15 @@ class MtgInterface {
       if (data.name)
         deckString = deckString.replace(name, data.name);
       if (data.code == "not_found") {
-        data = { image_uris: {}, legalities: {}, prices: { usd: 0 }, mana_cost: "", cmc: 0, type_line: "land" };
+        data = {
+          image_uris: {},
+          legalities: {},
+          prices: { usd: 0 },
+          mana_cost: "",
+          cmc: 0,
+          type_line: "land",
+          purchase_uris: { cardmarket: "" }
+        };
       }
       if (deck[name]) {
         deck[name].count += count;

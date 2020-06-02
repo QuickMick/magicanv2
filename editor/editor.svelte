@@ -537,6 +537,31 @@ mountain
     padding: 10px;
     flex-shrink: 0;
   }
+
+  .shoping {
+    position: absolute;
+    z-index: 10;
+    font-size: 3em;
+    text-shadow: 0px 0px 6px black;
+    text-align: center;
+    bottom: 10%;
+    right: 10%;
+    display: none;
+  }
+
+  .entry:hover .shoping {
+    display: block;
+  }
+
+  .shoping a {
+    text-decoration: none;
+  }
+
+  .shoping a :hover {
+    color: transparent;
+    text-shadow: 0 0 0 blue;
+  }
+
   .card {
     position: absolute;
     border: 6px solid rgb(22, 22, 22);
@@ -1015,7 +1040,11 @@ mountain
               <div
                 class="entry"
                 style={'width:' + width + 'px; height:' + (card.count <= 4 ? height + ((card.count || 1) - 1) * 40 : height + 3 * 40) + 'px;'}>
-
+                <div class="shoping">
+                  <a href={card.data.purchase_uris.cardmarket} target="_blank">
+                    &#128722;
+                  </a>
+                </div>
                 {#each { length: card.count > 4 ? 4 : card.count } as _, i}
                   <img
                     class:banned={card.data.legalities[format.value] !== 'legal'}
