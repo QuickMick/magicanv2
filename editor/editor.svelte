@@ -557,7 +557,7 @@ mountain
     text-decoration: none;
   }
 
-  .shoping a :hover {
+  .shoping a:hover {
     color: transparent;
     text-shadow: 0 0 0 blue;
   }
@@ -1163,6 +1163,9 @@ mountain
             <div
               class="entry"
               style={'width:' + width + 'px; height:' + height + 'px;'}>
+              <div class="shoping">
+                <a href={card.cardmarket} target="_blank">&#128722;</a>
+              </div>
               <img
                 on:dblclick={() => appendCard(card.name)}
                 class:banned={card.legalities[format.value] !== 'legal'}

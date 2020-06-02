@@ -73,6 +73,7 @@ class MtgInterface {
             }
           }
           c.url = c ? c.image_uris.border_crop || c.image_uris.normal : "";
+          c.cardmarket = (c.purchase_uris || {}).cardmarket || "";
           this.__cache[c.name] = c;
         }
         return response;
