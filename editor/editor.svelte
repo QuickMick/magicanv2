@@ -626,6 +626,7 @@ mountain
     /* margin: 10px; */
     margin-left: -3px;
     margin-top: -3px;
+    overflow: auto;
   }
 
   .card-context-entry {
