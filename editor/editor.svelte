@@ -12,6 +12,7 @@
 
   function enableSaving() {
     useCookies = true;
+    Cookies.set("useCookies", true);
     saveAllToCookies();
   }
 
