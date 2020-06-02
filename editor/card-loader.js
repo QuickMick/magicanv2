@@ -44,12 +44,12 @@ class MtgInterface {
 
 
       if (opts.type) {
-        let type = opts.type.trim().replace(/\s+/gm, "+type%3A");
+        let type = opts.type.trim().replace(/\s\s+/gm, " ").replace(/\s/gm, "+type%3A");
         queries.push("type%3A" + type);
       }
       if (opts.text) {
-        let text = opts.text.trim().replace(/\s+/gm, "+oracle%3A");
-        queries.push("oracle%3A" + opts.text);
+        let text = opts.text.trim().replace(/\s\s+/gm, " ").replace(/\s+/gm, "+oracle%3A");
+        queries.push("oracle%3A" + text);
       }
 
       baseurl = baseurl + queries.join("+");
