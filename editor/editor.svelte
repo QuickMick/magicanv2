@@ -148,6 +148,38 @@
     });
   }
 
+  let currentCardContext = null;
+  function cardContextMenu(evt, card) {
+    evt.preventDefault();
+    if (evt.which == 3) {
+      // right click
+      currentCardContext = card;
+    }
+    return false;
+  }
+
+  function cardContextClick(evt, card, group) {
+    currentCardContext = null;
+    evt.stopPropagation();
+    evt.preventDefault();
+    let deck = input.value;
+
+    const r = new RegExp(`^.*${card.name}.*$`, "gmi");
+    deck = deck.replace(r, "");
+    let index = deck.indexOf(group.name);
+    if (index < 0) return;
+    index += group.name.length;
+
+    const insert = "\n" + card.count + " " + card.name;
+    deck = deck.slice(0, index) + insert + deck.slice(index);
+    input.value = deck;
+    reload();
+  }
+
+  function onMainMouseDown(evt) {
+    currentCardContext = null;
+  }
+
   let hiddenGroups = new Set();
 
   function toggleGroupVisibility(group) {
@@ -167,6 +199,7 @@
     if (!deckSearchInput) return;
     deckSearchInput.value = "";
   }
+
   function sortDeckString() {
     promise = CardLoader.sort(input.value || "", (p, a) => {
       resetDeckSearch();
@@ -244,7 +277,7 @@
       })
       .then(res => {
         input.value = res.corrected;
-
+        Cookies.set("deck", input.value);
         setTimeout(() => {
           display.scrollTop = scrollPosition;
         });
@@ -583,6 +616,32 @@ mountain
     cursor: pointer;
   }
 
+  .card-context-menu {
+    position: absolute;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.7);
+    height: 100%;
+    width: 100%;
+    /* padding: 10px; */
+    /* margin: 10px; */
+    margin-left: -3px;
+    margin-top: -3px;
+  }
+
+  .card-context-entry {
+    margin: 10px;
+    font-weight: bold;
+    background: white;
+    padding: 5px;
+    border-radius: 9px;
+    box-shadow: 0 0 6px black;
+    cursor: pointer;
+  }
+
+  .card-context-entry:hover {
+    background: wheat;
+  }
+
   .price,
   .banned-text,
   .count {
@@ -787,7 +846,11 @@ mountain
   }
 </style>
 
-<svelte:window on:keyup={mainKeyUp} on:keydown={mainKeyDown} />
+<svelte:window
+  on:mouseup={onMainMouseDown}
+  on:contextmenu|preventDefault={() => false}
+  on:keyup={mainKeyUp}
+  on:keydown={mainKeyDown} />
 <div class="content">
   <div class="controls">
     <div class="help">
@@ -1052,6 +1115,7 @@ mountain
                   <img
                     class:banned={card.data.legalities[format.value] !== 'legal'}
                     class:highlighted={devotionHighlight == card.data.cmc}
+                    on:mouseup|stopPropagation={evt => cardContextMenu(evt, card)}
                     on:dblclick={() => remove(card)}
                     class="card"
                     style={'margin-top: ' + i * 40 + 'px'}
@@ -1070,6 +1134,21 @@ mountain
 
                 {#if scaling > 90}
                   <div class="price">{card.data.prices.usd + '$' || '???'}</div>
+                {/if}
+
+                {#if currentCardContext === card}
+                  <div class="card-context-menu">
+
+                    {#each groups as subGroup}
+                      {#if group.name != subGroup.name}
+                        <div
+                          class="card-context-entry"
+                          on:mousedown={evt => cardContextClick(evt, card, subGroup)}>
+                          {subGroup.name}
+                        </div>
+                      {/if}
+                    {/each}
+                  </div>
                 {/if}
 
               </div>
