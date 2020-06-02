@@ -8,6 +8,21 @@
   let _height = 300;
   let _width = Math.floor(_height * CARD_RATIO);
 
+  let useCookies = true;
+
+  function enableSaving() {
+    useCookies = true;
+    saveAllToCookies();
+  }
+
+  const oldSet = Cookies.set;
+  Cookies.set = (a, b) => {
+    if (useCookies) oldSet(a, b);
+    else {
+      console.log("saving disabled");
+    }
+  };
+
   let height = _height;
   let width = _width;
   let cardSearchActive = true;
@@ -278,19 +293,22 @@
 
   let helpActive = false;
   onMount(async () => {
-    let start =
-      Cookies.get("deck") ||
-      `#lands
+    const defaultDeck = `#lands
 mountain
 2 plains
 3 swamps
 # main deck
 20 blightsteel colossus`;
 
+    useCookies = Cookies.get("useCookies");
+
     const urlParams = new URLSearchParams(window.location.search);
     const sharedDeck = urlParams.get("d");
 
+    let start = useCookies ? Cookies.get("deck") || defaultDeck : defaultDeck;
+
     if (sharedDeck) {
+      useCookies = false;
       const buffer = new Uint8Array(sharedDeck.split(","));
       const decompressed = LZUTF8.decompress(buffer);
       if (decompressed) {
@@ -309,16 +327,23 @@ mountain
 
     //  helpActive = Cookies.get("helpActive") == "true";
     // console.log("help:", Cookies.get("helpActive"));
-    cardSearchActive = Cookies.set("cardSearchActive") == "true";
-    console.log("search:", Cookies.set("cardSearchActive"));
-    statisticsActive = Cookies.set("statisticsActive") == "true";
-    console.log("statistics:", Cookies.set("statisticsActive"));
+    cardSearchActive = Cookies.get("cardSearchActive") == "true";
+    console.log("search:", Cookies.get("cardSearchActive"));
+    statisticsActive = Cookies.get("statisticsActive") == "true";
+    console.log("statistics:", Cookies.get("statisticsActive"));
 
     statisticsActive;
     input.value = start;
-    console.log("STSFSDF", Cookies.get("deck")),
-      (promise = CardLoader.createDeck(start, (p, a) => sp(p, a)));
+    reload();
+    /* console.log("STSFSDF", Cookies.get("deck")),
+      (promise = CardLoader.createDeck(start, (p, a) => sp(p, a)));*/
   });
+
+  function saveAllToCookies() {
+    Cookies.set("cardSearchActive", cardSearchActive);
+    Cookies.set("statisticsActive", statisticsActive);
+    Cookies.set("deck", input.value);
+  }
 
   function shareDeck() {
     if (!input || !input.value) {
@@ -741,7 +766,15 @@ mountain
   <div class="controls">
     <div class="help">
       <div class="help-symbol" on:click={openHelp}>?</div>
-
+      {#if !useCookies}
+        <div class="cookie-warning" style="margin-right: 30px;">
+          Saving has been disabled, to enable it, click the following button.
+          Only do it, if you accept the usage of cookies
+          <button class="cookie-btn" on:click={enableSaving}>
+            activate-cookies
+          </button>
+        </div>
+      {/if}
       {#if helpActive}
         <h4>How to use:</h4>
         <p>paste your deck to the following input.</p>
