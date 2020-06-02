@@ -553,11 +553,11 @@ mountain
     display: block;
   }
 
-  .shoping a {
+  .shoping .link {
     text-decoration: none;
   }
 
-  .shoping a:hover {
+  .shoping .link:hover {
     color: transparent;
     text-shadow: 0 0 0 blue;
   }
@@ -1041,7 +1041,10 @@ mountain
                 class="entry"
                 style={'width:' + width + 'px; height:' + (card.count <= 4 ? height + ((card.count || 1) - 1) * 40 : height + 3 * 40) + 'px;'}>
                 <div class="shoping">
-                  <a href={card.data.purchase_uris.cardmarket} target="_blank">
+                  <a
+                    class="link"
+                    href={card.data.purchase_uris.cardmarket}
+                    target="_blank">
                     &#128722;
                   </a>
                 </div>
@@ -1164,7 +1167,9 @@ mountain
               class="entry"
               style={'width:' + width + 'px; height:' + height + 'px;'}>
               <div class="shoping">
-                <a href={card.cardmarket} target="_blank">&#128722;</a>
+                <a class="link" href={card.cardmarket} target="_blank">
+                  &#128722;
+                </a>
               </div>
               <img
                 on:dblclick={() => appendCard(card.name)}
