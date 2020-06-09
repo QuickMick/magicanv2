@@ -1,8 +1,17 @@
 <script>
   import { onMount } from "svelte";
-  import CardLoader from "./card-loader.js";
-  import LZUTF8 from "lzutf8";
-  import Cookies from "js-cookie";
+  // const { ipcRenderer } = require("electron");
+
+  const ipc = require("electron").ipcRenderer;
+  import cl from "./card-loader.js";
+  const CardLoader = new cl(ipc);
+  // import LZUTF8 from "lzutf8";
+  //import Cookies from "js-cookie";
+
+  const Cookies = {
+    set: () => {},
+    get: () => {}
+  };
 
   const CARD_RATIO = 0.71764705882;
   let _height = 300;
@@ -217,10 +226,13 @@
 
   let deckNameInput;
   function saveDeck() {
-    if (!deckNameInput) return;
-    const filename = (deckNameInput.value || "unknown deck") + ".txt";
-    const deck = input.value;
-    const blob = new Blob([deck], { type: "text/plain;charset=utf-8" });
+    if (!deckNameInput) return alert("pls input a name");
+
+    // const filename = (deckNameInput.value || "unknown deck") + ".txt";
+
+    ipc.send("saveDeck", { deck: input.value, name: deckNameInput.value });
+
+    /*  const blob = new Blob([deck], { type: "text/plain;charset=utf-8" });
     if (window.navigator.msSaveOrOpenBlob)
       // IE10+
       window.navigator.msSaveOrOpenBlob(blob, filename);
@@ -236,7 +248,7 @@
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
       }, 0);
-    }
+    }*/
   }
 
   function onDeckNameType() {
@@ -343,11 +355,11 @@ mountain
 
     if (sharedDeck) {
       useCookies = false;
-      const buffer = new Uint8Array(sharedDeck.split(","));
-      const decompressed = LZUTF8.decompress(buffer);
+      /* const buffer = new Uint8Array(sharedDeck.split(","));
+    * const decompressed = LZUTF8.decompress(buffer);
       if (decompressed) {
         start = decompressed;
-      }
+      }*/
     }
 
     urlParams.delete("d");
@@ -369,6 +381,14 @@ mountain
     statisticsActive;
     input.value = start;
     reload();
+
+    ipc.on("loadDeck", (sender, data) => {
+      console.log("LOADING DECK", data.name);
+      input.value = data.deck;
+      deckNameInput.value = (data.name || "").replace(".gdeck", "");
+      reload();
+    });
+
     /* console.log("STSFSDF", Cookies.get("deck")),
       (promise = CardLoader.createDeck(start, (p, a) => sp(p, a)));*/
   });
@@ -380,7 +400,7 @@ mountain
   }
 
   function shareDeck() {
-    if (!input || !input.value) {
+    /*   if (!input || !input.value) {
       alert("The deck is empty, nothing copied");
       return;
     }
@@ -394,7 +414,7 @@ mountain
     el.select();
     document.execCommand("copy");
     document.body.removeChild(el);
-    alert("link to deck copied");
+    alert("link to deck copied");*/
   }
 
   function onTyping() {

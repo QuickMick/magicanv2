@@ -1,6 +1,15 @@
 // path to where the images are downloaded
 //const CARD_DATA = require("./scryfall-default-cards.json");
 
+
+//const fs = require("fs");
+
+const ObjectId = () => { return Date.now() }; // require("bson-objectid");
+
+
+const TEMP = "temp";
+const __dirname = "./";
+
 function timeout() {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
@@ -9,11 +18,76 @@ function timeout() {
   });
 }
 
+
+
+
+/*
+
+*/
+
+
 class MtgInterface {
 
-  constructor() {
+  constructor(ipcRenderer) {
     this.__cache = {};
+    this.ipcRenderer = ipcRenderer;
+    this.downloads = Promise.resolve();
+    this.fetches = Promise.resolve();
+
+
+    this.loadProms = {};
+    this.existProms = {};
+
+    ipcRenderer.on("fileLoaded", (sender, data) => {
+      const c = this.loadProms[data.id];
+      if (!c) return;
+      if (data.error) c.reject(data.error);
+      else c.resolve(JSON.parse(data.result || "{}"))
+      delete this.loadProms[data.id];
+    });
+
+    ipcRenderer.on("fileChecked", (sender, data) => {
+      const c = this.existProms[data.id];
+      if (!c) return;
+      if (data.error) c.resolve(false); //c.reject(data.error);
+      else c.resolve(true)
+      delete this.existProms[data.id];
+    });
   }
+
+
+  doesFileExist(path) {
+    const id = ObjectId().toString();
+    const p = new Promise((resolve, reject) => {
+
+      this.ipcRenderer.send("checkFile", { path, id });
+      this.existProms[id] = { resolve, reject };
+    });
+    return p;
+  }
+
+  saveFile(path, content) {
+    const id = ObjectId().toString();
+    content = JSON.stringify(content);
+    this.ipcRenderer.send("saveFile", { path, content, id });
+
+    /*  return new Promise((resolve, reject) => {
+        fs.writeFile(file, content, function(err) {
+          if (err) return reject(err);
+          resolve();
+        });
+      });*/
+  }
+
+  loadFile(path) {
+    const id = ObjectId().toString();
+    const p = new Promise((resolve, reject) => {
+      this.ipcRenderer.send("loadFile", { path, id });
+      this.loadProms[id] = { resolve, reject };
+    });
+    return p;
+  }
+
 
   search(opts = {}) {
     // https://api.scryfall.com/cards/search?order=cmc&q=c%3Ared+pow%3D3 
@@ -84,6 +158,20 @@ class MtgInterface {
 
   async cardByName(name) {
     if (this.__cache[name]) return this.__cache[name];
+
+    const p = name; //path.join(__dirname, TEMP, name);
+    const exists = await this.doesFileExist(p);
+
+    try {
+      if (exists) {
+        this.__cache[name] = await this.loadFile(p);
+        return this.__cache[name];
+      }
+    } catch (e) {
+      console.error("could not load local file", name, e.message);
+    }
+
+
     await timeout();
     //https://api.scryfall.com/cards/named?fuzzy=aust+com 
     const fixed = name.replace(/\s/g, "+");
@@ -92,6 +180,7 @@ class MtgInterface {
 
     this.__cache[name] = result;
     this.__cache[result.name] = result;
+    this.saveFile(name, this.__cache[name]);
     return result;
     // .then(data => console.log(data));
     /* for (let card of CARD_DATA) {
@@ -427,5 +516,4 @@ class MtgInterface {
   }
 }
 
-
-module.exports = new MtgInterface();
+module.exports = MtgInterface;

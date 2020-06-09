@@ -3,3 +3,5 @@ node_modules
 */scryfall*
 public/bundle.js
 public/imgs/*.jpg
+editor/temp*
+editor/editor-win32-x64*
