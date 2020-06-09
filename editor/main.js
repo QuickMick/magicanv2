@@ -58,7 +58,7 @@ class Window extends BrowserWindow {
     this.on('closed', () => {});
 
     ipcMain.on("saveDeck", (sender, event) => {
-      const file = path.join(HOME_PATH, event.name.replace(/[^a-zA-Z\s.]/g, ""));
+      const file = path.join(HOME_PATH, event.name + ".gdeck");
       fs.writeFile(file, event.deck, (err) => {
         console.log("saved", file);
         this.updateMenu();
@@ -120,6 +120,7 @@ class Window extends BrowserWindow {
     const menuTemplate = [];
     const decks = fs.readdir(HOME_PATH, (err, decks) => {
       for (let deckFile of decks) {
+        if (deckFile == "settings.cfg") continue;
         menuTemplate.push({
           label: deckFile,
           click: () => {
@@ -146,7 +147,7 @@ app.on('ready', () => {
     const x = app.getAppPath().replace(/\\/g, "\/");
     let url = request.url.replace(x, "").replace("file:\/\/", "").replace(__dirname, "");
 
-    fs.writeFileSync("./text.txt", url + "\n" + request.url + "\n" + app.getAppPath() + "\n" + x);
+    //fs.writeFileSync("./text.txt", url + "\n" + request.url + "\n" + app.getAppPath() + "\n" + x);
     // url = url.replace("/F:/PROGRAMMING/magicanv2/editor/node_modules/electron/dist/resources/default_app.asar/", "");
     url = path.join(__dirname, url);
     url = path.normalize(url);

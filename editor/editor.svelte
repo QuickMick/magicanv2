@@ -876,15 +876,6 @@ mountain
   <div class="controls">
     <div class="help">
       <div class="help-symbol" on:click={openHelp}>?</div>
-      {#if !useCookies}
-        <div class="cookie-warning" style="margin-right: 30px;">
-          Saving has been disabled, to enable it, click the following button.
-          Only do it, if you accept the usage of cookies
-          <button class="cookie-btn" on:click={enableSaving}>
-            activate-cookies
-          </button>
-        </div>
-      {/if}
       {#if helpActive}
         <h4>How to use:</h4>
         <p>paste your deck to the following input.</p>
