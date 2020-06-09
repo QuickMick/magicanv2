@@ -143,10 +143,15 @@ class Window extends BrowserWindow {
 
 app.on('ready', () => {
   protocol.interceptFileProtocol('file', (request, callback) => {
-    let url = request.url.replace("file:\/\/", "").replace(__dirname, "");
-    url = url.replace("/F:/PROGRAMMING/magicanv2/editor/node_modules/electron/dist/resources/default_app.asar/", "");
+    const x = app.getAppPath().replace(/\\/g, "\/");
+    let url = request.url.replace(x, "").replace("file:\/\/", "").replace(__dirname, "");
+
+    fs.writeFileSync("./text.txt", url + "\n" + request.url + "\n" + app.getAppPath() + "\n" + x);
+    // url = url.replace("/F:/PROGRAMMING/magicanv2/editor/node_modules/electron/dist/resources/default_app.asar/", "");
     url = path.join(__dirname, url);
     url = path.normalize(url);
+
+
     url = url;
     console.log(url);
     callback({ path: url });
