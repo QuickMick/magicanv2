@@ -195,6 +195,9 @@ class MtgInterface {
     let creatures = {};
     let spells = {};
     let lands = {};
+
+
+
     let maybe = [];
     const errors = [];
 
@@ -385,6 +388,9 @@ class MtgInterface {
     let sorceryCount = 0;
     let enchantmentCount = 0;
     let artifactCount = 0;
+    let planeswalkerCount = 0;
+
+    let typeCounts = {};
 
     //mana_cost.split("G").length - 1
     for (let group of groups) {
@@ -435,8 +441,21 @@ class MtgInterface {
           if (card.data.type_line.toLowerCase().includes("sorcery")) {
             sorceryCount += card.count;
           }
-        }
+          if (card.data.type_line.toLowerCase().includes("planeswalker")) {
+            planeswalkerCount += card.count;
+          }
 
+          // and now all
+
+          const types = card.data.type_line.toLowerCase().replace("-", " ").replace("—", " ").replace("//", " ").replace("basic", " ").split(" ");
+          for (let t of types) {
+            t = t.trim();
+            if (!t) continue;
+            if (!typeCounts[t]) typeCounts[t] = 0;
+            typeCounts[t]++;
+          }
+
+        }
 
         card.data.mana_cost = card.data.mana_cost || "";
         devotion.blue += (card.data.mana_cost.split("U").length - 1) * card.count;
@@ -510,8 +529,24 @@ class MtgInterface {
     groups["creatureCount"] = creatureCount;
     groups["instantCount"] = instantCount;
     groups["sorceryCount"] = sorceryCount;
+    groups["planeswalkerCount"] = planeswalkerCount;
     groups["enchantmentCount"] = enchantmentCount;
     groups["artifactCount"] = artifactCount;
+    groups["typeCounts"] = typeCounts;
+
+    delete typeCounts.enchantment;
+    delete typeCounts.planeswalker;
+    delete typeCounts.sorcery;
+    delete typeCounts.instant;
+    delete typeCounts.artifact;
+    delete typeCounts.creature;
+    delete typeCounts.land;
+
+    let typeNames = Object.keys(typeCounts);
+    console.log("b", typeNames);
+    typeNames = typeNames.sort((a, b) => typeCounts[a] < typeCounts[b] ? 1 : -1);
+    console.log("a", typeNames);
+    groups["typeNames"] = typeNames;
     return groups;
   }
 }

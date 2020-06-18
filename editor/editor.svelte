@@ -438,6 +438,16 @@ mountain
     statisticsActive = !statisticsActive;
     Cookies.set("statisticsActive", statisticsActive + "");
   }
+
+  let highlightedCreature = "";
+  function highlightCreature(typeName) {
+    if (typeName == highlightedCreature) {
+      highlightedCreature = "";
+      return;
+    } else {
+      highlightedCreature = typeName;
+    }
+  }
 </script>
 
 <style>
@@ -528,6 +538,25 @@ mountain
   .group-content.hidden {
     overflow: hidden;
     height: 45px;
+  }
+
+  .all-type-count {
+    height: 125px;
+    overflow: auto;
+    background: lightsteelblue;
+    padding: 10px;
+  }
+
+  .type-selector {
+    cursor: pointer;
+  }
+
+  .type-selector:not(.highlighted-creature):hover {
+    background: aliceblue;
+  }
+
+  .highlighted-creature {
+    background: steelblue;
   }
 
   .card-search {
@@ -629,6 +658,10 @@ mountain
 
   .card.highlighted {
     border: 6px solid yellow;
+  }
+
+  .card.type-highlight {
+    border: 6px solid blueviolet;
   }
 
   .card:hover {
@@ -906,11 +939,53 @@ mountain
             Lands: {groups['landCount']} Nonlands: {groups['cardCount'] - groups['landCount']}
           </div>
 
-          <div>Creatures: {groups['creatureCount']}</div>
-          <div>Instants: {groups['instantCount']}</div>
-          <div>Sorceries: {groups['sorceryCount']}</div>
-          <div>Enchantments: {groups['enchantmentCount']}</div>
-          <div>Artifacts: {groups['artifactCount']}</div>
+          <div
+            class="type-selector"
+            on:click={() => highlightCreature('creature')}
+            class:highlighted-creature={'creature' == highlightedCreature}>
+            Creatures: {groups['creatureCount']}
+          </div>
+          <div
+            class="type-selector"
+            on:click={() => highlightCreature('instant')}
+            class:highlighted-creature={'instant' == highlightedCreature}>
+            Instants: {groups['instantCount']}
+          </div>
+          <div
+            class="type-selector"
+            on:click={() => highlightCreature('sorcery')}
+            class:highlighted-creature={'sorcery' == highlightedCreature}>
+            Sorceries: {groups['sorceryCount']}
+          </div>
+          <div
+            class="type-selector"
+            on:click={() => highlightCreature('enchantment')}
+            class:highlighted-creature={'enchantment' == highlightedCreature}>
+            Enchantments: {groups['enchantmentCount']}
+          </div>
+          <div
+            class="type-selector"
+            on:click={() => highlightCreature('artifact')}
+            class:highlighted-creature={'artifact' == highlightedCreature}>
+            Artifacts: {groups['artifactCount']}
+          </div>
+          <div
+            class="type-selector"
+            on:click={() => highlightCreature('planeswalker')}
+            class:highlighted-creature={'planeswalker' == highlightedCreature}>
+            Planeswalker: {groups['planeswalkerCount']}
+          </div>
+          <div class="all-type-count">
+            {#each groups['typeNames'] as typeName}
+              <div
+                class="type-selector"
+                on:click={() => highlightCreature(typeName)}
+                class:highlighted-creature={typeName == highlightedCreature}>
+                {typeName}: {groups['typeCounts'][typeName]}
+              </div>
+            {/each}
+
+          </div>
 
           <div>Cost: {groups.cost.toFixed(2) + '$'}</div>
 
@@ -1127,6 +1202,9 @@ mountain
                   <img
                     class:banned={card.data.legalities[format.value] !== 'legal'}
                     class:highlighted={devotionHighlight == card.data.cmc}
+                    class:type-highlight={highlightedCreature && card.data.type_line
+                        .toLowerCase()
+                        .includes(highlightedCreature)}
                     on:mouseup|stopPropagation={evt => cardContextMenu(evt, card, groups)}
                     on:dblclick={() => remove(card)}
                     class="card"
