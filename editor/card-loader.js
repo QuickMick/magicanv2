@@ -18,9 +18,6 @@ function timeout() {
   });
 }
 
-
-
-
 /*
 
 */
@@ -475,6 +472,7 @@ class MtgInterface {
       group.mana = devotion;
       group.cost = cost;
 
+
       group.manaCurve = manaCurve;
       for (let i = 0; i < manaCurve.length; i++) {
         manaCurve[i] = manaCurve[i] || 0;
@@ -524,6 +522,14 @@ class MtgInterface {
     groups["mana"] = overallDevotion;
     groups["corrected"] = deckString;
     groups["manaCurve"] = overallManaCurve;
+
+
+    // TODO: hypergeomatric distribution
+    // for (let group of groups) {
+    //   group.chances = hypergeometricDistribution(group.count, 11, 1, overallCount);
+    // }
+
+
 
 
     groups["creatureCount"] = creatureCount;

@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   // const { ipcRenderer } = require("electron");
-
+  import PlayTester from "./playtester.svelte";
   const ipc = require("electron").ipcRenderer;
   import cl from "./card-loader.js";
   const CardLoader = new cl(ipc);
@@ -35,7 +35,8 @@
 
   let height = _height;
   let width = _width;
-  let cardSearchActive = true;
+  let cardSearchActive = false;
+  let playTesterActive = false;
   let statisticsActive = true;
   let scaling = 100;
 
@@ -430,6 +431,10 @@ mountain
     //  Cookies.set("helpActive", helpActive + "");
   }
 
+  function togglePlayTest() {
+    playTesterActive = !playTesterActive;
+  }
+
   function toggleSearch() {
     cardSearchActive = !cardSearchActive;
     Cookies.set("cardSearchActive", cardSearchActive + "");
@@ -557,6 +562,23 @@ mountain
 
   .highlighted-creature {
     background: steelblue;
+  }
+
+  .play-tester {
+    height: 100%;
+    flex-grow: 1;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    right: 0;
+    width: 100%;
+    z-index: 150;
+    box-shadow: 0px 0px 10px black;
+  }
+
+  .play-tester.hide {
+    display: none;
   }
 
   .card-search {
@@ -1123,6 +1145,9 @@ mountain
         title="toggles the visibility of the statisticks">
         {statisticsActive ? 'hide statistics' : 'show statistics'}
       </button>
+
+      <button on:click={togglePlayTest} title="test your deck">playtest</button>
+
       <button
         on:click={sortDeckString}
         title="this sorts the deck to lands spells and creatures -NOTE: your
@@ -1179,6 +1204,8 @@ mountain
               <div class="group-value group-cost">
                 {group.cost.toFixed(2) + '$'}
               </div>
+              chances:
+              <!-- <div class="group-value sum">{group.chances}</div> -->
             </div>
 
           </div>
@@ -1255,6 +1282,12 @@ mountain
       </div>
     {/await}
   </div>
+
+  {#if playTesterActive}
+    <div class="play-tester">
+      <PlayTester bind:playTesterActive {promise} />
+    </div>
+  {/if}
 
   <div class="card-search" class:hide={!cardSearchActive}>
     <div class="toggle-search" on:click={toggleSearch}>x</div>

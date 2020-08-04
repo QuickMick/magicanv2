@@ -5,3 +5,4 @@ public/bundle.js
 public/imgs/*.jpg
 editor/temp*
 editor/editor-win32-x64*
+editor/deckeditor-win32-x64*

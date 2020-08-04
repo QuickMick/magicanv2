@@ -1,28 +1,37 @@
-<div
-  class="entry"
-  style={'width:' + width + 'px; height:' + (card.count <= 4 ? height + ((card.count || 1) - 1) * 40 : height + 3 * 40) + 'px;'}>
+<script>
+  export let card = {};
 
-  {#each { length: card.count > 4 ? 4 : card.count } as _, i}
-    <img
-      class:banned={card.data.legalities[format.value] !== 'legal'}
-      on:dblclick={() => remove(card)}
-      class="card"
-      style={'margin-top: ' + i * 40 + 'px'}
-      src={card.url}
-      alt={card.name}
-      {width}
-      {height} />
-  {/each}
+  const CARD_RATIO = 0.71764705882;
+  let _height = 250;
+  let _width = Math.floor(_height * CARD_RATIO);
+  let height = _height;
+  let width = _width;
+</script>
 
-  {#if card.data.legalities[format.value] !== 'legal'}
-    <div class="banned-text">BANNED</div>
-  {/if}
-  {#if card.count > 4}
-    <div class="count">{card.count}x</div>
-  {/if}
+<style>
+  .entry {
+    position: relative;
+    padding: 10px;
+    flex-shrink: 0;
+  }
 
-  {#if scaling > 90}
-    <div class="price">{card.data.prices.usd + '$' || '???'}</div>
-  {/if}
+  .card {
+    position: absolute;
+    border: 6px solid rgb(22, 22, 22);
+    border-radius: 10px;
+    outline: 0;
+    box-shadow: 0px 0px 10px black;
+  }
+</style>
+
+<div class="entry" style={'width:' + width + 'px; height:' + height + 'px;'}>
+
+  <img
+    class="card"
+    style={'margin-top: 0px'}
+    src={card.url}
+    alt={card.name}
+    {width}
+    {height} />
 
 </div>
