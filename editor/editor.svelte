@@ -137,6 +137,31 @@
     spEDHColorless.checked = false;
   }
 
+  function cleanString() {
+    const array = input.value.split("\n");
+    let result = [];
+    for (let a of array) {
+      if (!a) continue;
+      a = a.trim();
+      if (!a || a.startsWith("//")) continue;
+      //  if (/[\n\r\s]+/gi.test(a)) continue;
+
+      if (a.startsWith("#")) {
+        a = a.replace("#", "\n#");
+      } else {
+        a = a.trim();
+        if (!/^\d/.test(a)) {
+          a = "1 " + a;
+        }
+      }
+
+      a = a.replace(/\s\s+/g, " ");
+      result.push(a);
+    }
+    input.value = result.join("\n").trim();
+    update({ keyCode: 27 });
+  }
+
   function searchCards(nextUrl) {
     if (typeof nextUrl == "string") {
       cardSearchPromise = CardLoader.search(nextUrl);
@@ -1158,6 +1183,11 @@ mountain
         on:click={copyDeck}
         title="this copies the deck without groups and stuff to your clipboard">
         clean copy
+      </button>
+      <button
+        on:click={cleanString}
+        title="cleans the input string from comments and newlines">
+        clean string
       </button>
       <button
         on:click={shareDeck}
